@@ -1,0 +1,16 @@
+HELP.md
+target/
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**
+!**/src/test/**
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+/out/**
+
+#以下文件大于100MB，上传到github有所限制（重要）
+**/**.safetensors
+**/modelsexec/**
