@@ -23,7 +23,7 @@ import javafx.stage.WindowEvent;
 /**
  * JavaFX App
  */
-
+// Tag 24.01
 public class App extends Application {
     private final static String statement = "Please use it for learning purposes only.  --author Logan Qin\n"
             + "Thank you for your understanding and cooperation.\n"
