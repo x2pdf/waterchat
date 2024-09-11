@@ -5,6 +5,10 @@
 
 每一个人都可以简单地使用 AI 大模型。
 
+##下载
+* 最新稳定版本：
+    1. Windows: https://github.com/x2pdf/waterchat/releases/tag/v24.01
+    2. Mac: https://github.com/x2pdf/waterchat/releases/tag/v24.02
 
 ## 主要功能简介
 
