@@ -5,10 +5,6 @@
 
 每一个人都可以简单地使用 AI 大模型。
 
-## 下载
-* 最新稳定版本：
-    1. Windows: https://github.com/x2pdf/waterchat/releases/tag/v24.01
-    2. Mac: https://github.com/x2pdf/waterchat/releases/tag/v24.02
 
 ## 主要功能简介
 
@@ -28,7 +24,9 @@
 4.广泛。 在 Windows 和 Mac 电脑上皆可使用！
 <br/>
 
-
+## Tips
+1.在MacOS首次安装打开之后，通常需要用户在Mac的 "设置-安全与隐私" 里面允许本应用运行，否则系统可能会提示本应用文件破损，不能打开运行之类的信息。
+2.通常情况是使用默认的设定即可，如需要改动设定，请阅读文档信息之后再正确设定。
 
 ## DEVELOPERS
 开发相关信息，请参考 README_DEV.MD 中的指引。

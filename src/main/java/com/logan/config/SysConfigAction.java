@@ -26,6 +26,16 @@ public class SysConfigAction {
         LogUtils.info("refreshConfig() 配置已更新！");
     }
 
+    public static HashMap<String, String> getAllConfigKeyValue(){
+        // 多个模型，配置选项的值
+        HashMap<String, String> configHashMap = new HashMap<>();
+        try {
+            configHashMap = parseKeyValueFile(SysConfig.TEMP_RESOURCES_PATH + SysConfig.CONFIG_PATH);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return configHashMap;
+    }
 
     public static HashMap<String, String> parseKeyValueFile(String filePath) throws IOException {
         HashMap<String, String> resultMap = new HashMap<>();
@@ -88,6 +98,7 @@ public class SysConfigAction {
 
         App.updateAppName();
         LogUtils.info("现在使用的模型是： " + SysConfig.MODEL_NAME);
+        LogUtils.log2LocalLogFile("现在使用的模型是： " + SysConfig.MODEL_NAME);
     }
 
     public static void updateConfigValue(String filePath, String key, String newValue) throws IOException {
@@ -136,7 +147,7 @@ public class SysConfigAction {
 
 
     public static String createAppResourcesPath() {
-        SysConfig.TEMP_RESOURCES_PATH = SysConfig.APP_DOWNLOAD_PATH + File.separator + "resources" + File.separator;
+        SysConfig.TEMP_RESOURCES_PATH = SysConfig.APP_DOWNLOAD_PATH + "resources" + File.separator;
         File file = new File(SysConfig.TEMP_RESOURCES_PATH);
         if (!file.exists()) {
             file.mkdirs();
@@ -144,13 +155,6 @@ public class SysConfigAction {
         return SysConfig.TEMP_RESOURCES_PATH;
     }
 
-    public static String getModelExecSourcePath() {
-        String modelExecSourcePath = SysConfig.MODEL_EXEC_SOURCE_PATH_MAC;
-        if (System.getProperty("os.name").toLowerCase().contains("windows")) {
-            modelExecSourcePath = SysConfig.MODEL_EXEC_SOURCE_PATH;
-        }
-        return modelExecSourcePath;
-    }
 
     public static boolean isMacOS() {
         if (System.getProperty("os.name").toLowerCase().contains("windows")) {

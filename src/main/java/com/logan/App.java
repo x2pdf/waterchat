@@ -1,6 +1,7 @@
 package com.logan;
 
 
+import com.logan.chat.LLaMAServerCtrl;
 import com.logan.chat.SessionCtrl;
 import com.logan.chatui.HelpPage;
 import com.logan.chatui.Homepage;
@@ -35,6 +36,7 @@ public class App extends Application {
         launch(args);
     }
 
+
     @Override
     public void start(Stage stage) {
         try {
@@ -46,11 +48,13 @@ public class App extends Application {
             }
 
             SysConfigAction.refreshConfig();
+            LLaMAServerCtrl.startLLaMAServer();
             initStage(stage);
             primaryStage = stage;
             stage.setOnCloseRequest(new EventHandler<WindowEvent>() {
                 @Override
                 public void handle(WindowEvent event) {
+                    LLaMAServerCtrl.shutdownLLaMAServer();
                     System.gc();
                 }
             });
@@ -58,6 +62,7 @@ public class App extends Application {
             LogUtils.error("initConfig exception: " + e.toString());
         } catch (Error error) {
             LogUtils.error("App Error. error info:" + error);
+            LLaMAServerCtrl.shutdownLLaMAServer();
             Alert warning = new Alert(Alert.AlertType.ERROR);
             warning.setTitle("ERROR");
             warning.setContentText("The program runs wrongly, sorry!");

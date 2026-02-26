@@ -1,5 +1,6 @@
 package com.logan.chatui;
 
+import com.logan.chat.LLaMAConf;
 import com.logan.chat.Message;
 import com.logan.chat.RoleEnum;
 import com.logan.chat.SessionCtrl;
@@ -8,10 +9,15 @@ import com.logan.utils.LogUtils;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.layout.*;
 
+import java.awt.*;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -43,7 +49,7 @@ public class Homepage {
             }
             String msg = textAreaInput.getText();
             LogUtils.info("======== input msg: " + textAreaInput.getText());
-            if (msg != null && !"".equals(msg)) {
+            if (msg != null && !msg.isEmpty()) {
                 // 消息加入到本地缓存list
                 HomepageAdaptor.addQuestion2MessagesList(msg);
                 HomepageAdaptor.newThreadAddMessage2Session(msg);
@@ -62,9 +68,36 @@ public class Homepage {
             SessionCtrl.createSession();
         });
 
-        HBox buttonBox = new HBox(buttonNewChat, buttonSend);
-        buttonBox.setSpacing(3);
-        buttonBox.setAlignment(Pos.BOTTOM_CENTER);
+
+        Button buttonOpenDeviceBrowser = new Button("在浏览器中和AI对话");
+        buttonOpenDeviceBrowser.setOnAction(event -> {
+            LogUtils.info("buttonOpenDeviceBrowser ");
+            try {
+                // 需要增加 “http://”
+                Desktop.getDesktop().browse(new URI("http://" + LLaMAConf.LLAMA_SERVER_HOST + ":" + LLaMAConf.LLAMA_SERVER_PORT));
+            } catch (IOException | URISyntaxException e) {
+                throw new RuntimeException(e);
+            }
+        });
+
+        CheckBox enableThinking = new CheckBox("Thinking");
+        enableThinking.setOnAction(e -> {
+            if (enableThinking.isSelected()) {
+                HomepageAdaptor.ENABLE_THINKING = true;
+                LogUtils.info("Thinking 功能已启用");
+            } else {
+                HomepageAdaptor.ENABLE_THINKING = false;
+                LogUtils.info("Thinking 功能已关闭");
+            }
+        });
+
+        // 创建占位 Region 来把右边按钮推到右边
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, javafx.scene.layout.Priority.ALWAYS);
+
+        HBox buttonBox = new HBox(buttonOpenDeviceBrowser, spacer,enableThinking, buttonNewChat, buttonSend);
+        buttonBox.setSpacing(5);
+        buttonBox.setAlignment(Pos.BASELINE_CENTER);
 
         VBox homepageVBox = new VBox();
         homepageVBox.setVgrow(scrollPane, Priority.ALWAYS); // 将 scrollPane 中的会话窗口从最顶开始往下显示
