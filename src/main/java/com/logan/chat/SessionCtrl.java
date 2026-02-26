@@ -29,7 +29,7 @@ public class SessionCtrl {
         // 初始化新会话数据
         Message message = new Message();
         message.setRole(RoleEnum.system);
-        message.setContent("How can I help you today?");
+        message.setContent("你是一个博览群书、上知天文下知地理、深刻理解人类世界各种经验的AI，你不仅心思缜密，有崇高的道德感，还洋溢热情乐于助人，是人类最好的朋友！");
         messages.add(message);
 
         // 刷新ui
@@ -37,25 +37,6 @@ public class SessionCtrl {
         HomepageAdaptor.clearInputBox();
     }
 
-
-    public static String addMessage2Session(String msg) throws IOException {
-        // 调用python model api
-        String messagesJson = getMessageStr();
-        byte[] msgBytes = new byte[1024];
-        if (messagesJson != null) {
-            msgBytes = messagesJson.getBytes(StandardCharsets.UTF_8);
-        }
-        LocalFileUtils.save2Path(msgBytes, SysConfig.APP_DOWNLOAD_PATH, SysConfig.MESSAGE_FILENAME);
-        LogUtils.info("messages file: " + SysConfig.APP_DOWNLOAD_PATH + SysConfig.MESSAGE_FILENAME);
-
-        callPython(SysConfig.APP_DOWNLOAD_PATH + SysConfig.MESSAGE_FILENAME,
-                SysConfig.TEMP_RESOURCES_PATH + SysConfig.CONFIG_PATH,
-                SysConfig.APP_DOWNLOAD_PATH + SysConfig.RESPONSE_FILENAME);
-        byte[] responseBytes = LocalFileUtils.load(SysConfig.APP_DOWNLOAD_PATH + SysConfig.RESPONSE_FILENAME);
-        String response = new String(responseBytes, StandardCharsets.UTF_8);
-
-        return response;
-    }
 
     public static void emptySession() {
         messages.clear();
@@ -90,69 +71,6 @@ public class SessionCtrl {
         return LogUtils.writeArrayListAsString(messages);
     }
 
-    /**
-     * 调用本地可执行的python文件
-     *
-     * @param messagePath  消息文件路径，必传参数
-     * @param configPath   配置文件路径，可选参数
-     * @param responsePath 返回消息文件保存路径，可选参数
-     */
-    public static void callPython(String messagePath, String configPath, String responsePath) {
-        try {
-            if (messagePath == null || "".equals(messagePath.trim())) {
-                return;
-            }
-            long start = System.currentTimeMillis();
-            String command = SysConfig.TEMP_RESOURCES_PATH + SysConfigAction.getModelExecSourcePath();
-
-            if (System.getProperty("os.name").toLowerCase().contains("windows")) {
-                command = command + " \"" + messagePath + "\"";
-                if (configPath != null) {
-                    command = command + " \"" + configPath + "\"";
-                }
-                if (responsePath != null) {
-                    command = command + " \"" + responsePath + "\"";
-                }
-            } else {
-                // mac 有双引号""包括参数反而报路径不存在 '"/User/...."'
-                command = command + " " + messagePath + "";
-                if (configPath != null) {
-                    command = command + " " + configPath + "";
-                }
-                if (responsePath != null) {
-                    command = command + " " + responsePath + "";
-                }
-            }
-
-
-
-            LogUtils.info("command: " + command);
-            Process process = Runtime.getRuntime().exec(command);
-
-            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-            String line;
-            while ((line = reader.readLine()) != null) {
-                LogUtils.info(line);
-            }
-            BufferedReader errorReader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
-            String errorLine;
-            while ((errorLine = errorReader.readLine()) != null) {
-                LogUtils.error("errorLine: " + errorLine); // Python脚本的错误输出
-            }
-
-            int exitValue = process.waitFor(); // success:1, fail:0
-            if (exitValue == 1) {
-                LogUtils.info("call python success.");
-            } else {
-                LogUtils.info("call python fail.");
-            }
-
-            LogUtils.info("===== call python spend(s): " + (System.currentTimeMillis() - start) / 1000);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-    }
 
 
 }
