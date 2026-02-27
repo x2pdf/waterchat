@@ -23,7 +23,6 @@ public class SysConfigAction {
     public static void refreshConfig() throws IOException {
         // TODO 優化，不必每次更新替換
         updateModelName(SysConfig.MODEL_NAME);
-        LLaMAServerCtrl.restartLLaMAServer();
         LogUtils.info("refreshConfig() 配置已更新！");
     }
 
