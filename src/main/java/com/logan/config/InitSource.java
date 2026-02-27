@@ -10,6 +10,7 @@ import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -79,9 +80,9 @@ public class InitSource {
                     copyFile(filePath + fileName, configTempPath + fileName);
 
                     if (line.contains("modelsexec")) {
-                        LogUtils.info("给复制的 modelsexec 文件授权：可执行 chmod +x ****。");
                         // MacOS 要授权, 才能执行命令行
                         if (SysConfigAction.isMacOS()) {
+                            LogUtils.info("给复制的 modelsexec 文件授权：可执行 chmod +x ****。");
                             Process process = Runtime.getRuntime().exec("chmod +x " + configTempPath + fileName);
                         }
                     }
@@ -127,7 +128,7 @@ public class InitSource {
 
     public static ArrayList<String> readFileLines(InputStream inputStream) throws IOException {
         ArrayList<String> lines = new ArrayList<>();
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))) {
             String line;
             while ((line = reader.readLine()) != null) {
                 lines.add(line);
