@@ -66,5 +66,7 @@ jpackage -n waterchat --app-image ./waterchat --vendor waterchat --app-version 2
 * 1找到本应用在电脑上的waterchat文件夹
 * 2在 waterchat/resoueces/models/ 创建你模型名称的文件夹，例如 Qwen3-1.7B-GGUF
 * 3将你的模型的所有参数文件下载并放到waterchat/resoueces/models/Qwen3-1.7B-GGUF 文件夹里面
-* 4更改 waterchat/resoueces/config/config.txt 里的 model_name_list 新增你的模型名称（英文逗号拼接，不要有空格）
-* 5启动本应用，切换到help页面，选择切换模型为 Qwen3-1.7B-GGUF即可。
+* 4更改 waterchat/resoueces/config/config.txt 里的 model_name_list 新增你的模型名称:Qwen3-1.7B-GGUF/Qwen3-1.7B-Q8_0.gguf（英文逗号拼接，不要有空格，需要指定到 xxxx.gguf文件名为止。如果新增的模型有多个gguf文件，例如 Qwen3-235B-A22B-GGUF/Q5_0 模型，它就有数个gguf文件：Qwen3-235B-A22B-Q5_0-00001-of-00006.gguf，Qwen3-235B-A22B-Q5_0-00002-of-00006.gguf，...
+等等，则需要指定第一个gguf文件名作为模型名称：Qwen3-235B-A22B-GGUF/Q5_0/Qwen3-235B-A22B-Q5_0-00001-of-00006.gguf）
+* 5启动本应用，切换到help页面，选择切换模型为 Qwen3-1.7B-GGUF/Qwen3-1.7B-Q8_0.gguf即可，有时可能需要退出应用再次打开本应用切换模型才能生效。
+* 强烈提醒：总之模型要制定到具体的 xxxx.gguf 文件为止。

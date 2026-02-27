@@ -1,6 +1,7 @@
 package com.logan.config;
 
 import com.logan.App;
+import com.logan.chat.LLaMAServerCtrl;
 import com.logan.utils.LogUtils;
 
 import javax.swing.filechooser.FileSystemView;
@@ -22,7 +23,7 @@ public class SysConfigAction {
     public static void refreshConfig() throws IOException {
         // TODO 優化，不必每次更新替換
         updateModelName(SysConfig.MODEL_NAME);
-
+        LLaMAServerCtrl.restartLLaMAServer();
         LogUtils.info("refreshConfig() 配置已更新！");
     }
 
@@ -83,6 +84,11 @@ public class SysConfigAction {
         String model_name = configHashMap.get("model_name");
         if (model_name != null) {
             SysConfig.MODEL_NAME = model_name;
+        }
+
+        String modelPath = configHashMap.get("model_path");
+        if (modelPath != null) {
+            SysConfig.MODEL_PATH = modelPath;
         }
 
         String model_default_system_prompt = configHashMap.get("model_default_system_prompt");

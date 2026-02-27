@@ -20,7 +20,7 @@ public class LLaMAConf {
     public static String LLAMA_SERVER_HOST = "127.0.0.1";
     public static String LLAMA_SERVER_PORT = "9088";
     public static String LLAMA_SERVER_BASE_URL = "http://" + LLAMA_SERVER_HOST +":" + LLAMA_SERVER_PORT + "/v1/chat/completions";
-    public static String LLAMA_SERVER_BASE_MODEL = "Qwen3-0.6B-GGUF";
+    public static String LLAMA_SERVER_BASE_MODEL = "Qwen3-0.6B-GGUF/Qwen3-0.6B-Q8_0.gguf";
 
     public static String getLLaMAExecPath() {
         String os = System.getProperty("os.name").toLowerCase();
