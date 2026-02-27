@@ -16,6 +16,7 @@ public class LLaMAConf {
     // Windows x64 (Vulkan)
     private static final String LLaMA_WIN_VULKAN_x64 = SysConfig.MODEL_EXEC_PATH + "/llama-win-vulkan-x64";
 
+    public static boolean IS_LLAMA_SERVER_STARTED = false;
     public static String LLAMA_SERVER_HOST = "127.0.0.1";
     public static String LLAMA_SERVER_PORT = "9088";
     public static String LLAMA_SERVER_BASE_URL = "http://" + LLAMA_SERVER_HOST +":" + LLAMA_SERVER_PORT + "/v1/chat/completions";
