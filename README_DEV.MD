@@ -56,6 +56,18 @@ jpackage -n waterchat --app-image ./waterchat --vendor waterchat --app-version 2
 的 model_path 中 models文件夹下的模型参数文件夹名称要和 model_name_list 保持一致。
 * config/resourcefilepath.txt 文件中指定了内置模型需要用到的文件，需要将 models文件夹下的每一个模型参数文件都配置，
 否则应用运行时会找不到运行模型需要的文件。
+* 为mac平台和windows平台打包可执行的安装包时，需要在 文件中使用不同的配置。主要是为了让安装包文件体积小一些。
+
+例如 mac（需要同时配置对应的 modelsexec 文件）: 
+modelsexec/=llama-mac-arm64.tar.gz
+modelsexec/=llama-mac-x64.tar.gz
+
+而 windows（需要同时配置对应的 modelsexec 文件）：
+modelsexec/=llama-win-cpu-x64.zip
+modelsexec/=llama-win-cpu-arm64.zip
+modelsexec/=llama-win-vulkan-x64.zip
+
+
 
 ## 4 兼容的AI模型说明
 *本应用应当都能够支持阿里巴巴通义千问 Qwen3 GGUF 类型的 AI 文本对话大模型。
