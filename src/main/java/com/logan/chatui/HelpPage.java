@@ -1,5 +1,6 @@
 package com.logan.chatui;
 
+import com.logan.chat.LLaMAServerCtrl;
 import com.logan.config.SysConfig;
 import com.logan.config.SysConfigAction;
 import com.logan.utils.AlertUtils;
@@ -206,10 +207,12 @@ public class HelpPage {
             int selectedIndex = vulkanChoiceBox.getSelectionModel().getSelectedIndex();
             if (selectedIndex == 0) {
                 SysConfig.IS_USE_VULKAN = true;
+                LLaMAServerCtrl.restartLLaMAServer();
                 LogUtils.info("使用Vulkan：Yes");
                 AlertUtils.msg("注意：如果切换到vulkan模式下使用本应用出现问题（应用不响应、崩溃等等），请手动关闭Vulkan模型，不要使用Vulkan。\n本应用并非在所有的环境下都能够正常调用Vulkan。谢谢。");
             } else {
                 SysConfig.IS_USE_VULKAN = false;
+                LLaMAServerCtrl.restartLLaMAServer();
                 LogUtils.info("使用Vulkan：No ");
             }
         });

@@ -84,6 +84,12 @@ public class SysConfigAction {
         if (model_name != null) {
             SysConfig.MODEL_NAME = model_name;
         }
+
+        String model_default_system_prompt = configHashMap.get("model_default_system_prompt");
+        if (model_default_system_prompt != null) {
+            SysConfig.MODEL_DEFAULT_SYSTEM_PROMPT = model_default_system_prompt;
+        }
+
     }
 
 

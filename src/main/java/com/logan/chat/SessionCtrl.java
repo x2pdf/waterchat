@@ -7,10 +7,7 @@ import com.logan.config.SysConfigAction;
 import com.logan.utils.LocalFileUtils;
 import com.logan.utils.LogUtils;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -29,7 +26,7 @@ public class SessionCtrl {
         // 初始化新会话数据
         Message message = new Message();
         message.setRole(RoleEnum.system);
-        message.setContent("你是一个博览群书、上知天文下知地理、深刻理解人类世界各种经验的AI，你不仅心思缜密，有崇高的道德感，还洋溢热情乐于助人，是人类最好的朋友！");
+        message.setContent(SysConfig.MODEL_DEFAULT_SYSTEM_PROMPT);
         messages.add(message);
 
         // 刷新ui

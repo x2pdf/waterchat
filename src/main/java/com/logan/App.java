@@ -9,6 +9,7 @@ import com.logan.config.InitSource;
 import com.logan.config.SysConfig;
 import com.logan.config.SysConfigAction;
 import com.logan.utils.LogUtils;
+import javafx.animation.PauseTransition;
 import javafx.application.Application;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
@@ -19,6 +20,7 @@ import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
+import javafx.util.Duration;
 
 
 /**
@@ -55,6 +57,7 @@ public class App extends Application {
                 @Override
                 public void handle(WindowEvent event) {
                     LLaMAServerCtrl.shutdownLLaMAServer();
+                    LogUtils.trimLogFileIfTooLarge();
                     System.gc();
                 }
             });
@@ -84,7 +87,6 @@ public class App extends Application {
         Tab tab1 = new Tab("会话窗口", homepageAnchorPane);
         tab1.setClosable(false);
         tab1.setStyle("-fx-pref-width: 80;");
-
         AnchorPane helpAnchorPane = HelpPage.getHelpTab();
         Tab tab2 = new Tab("Help", helpAnchorPane);
         tab2.setClosable(false);

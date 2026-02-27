@@ -29,8 +29,7 @@ public class LLaMAServerCtrl {
     private static final String API_KEY = "********";
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
-    public static String sendChat(List<Map<String, String>>  messages) throws Exception {
-
+    public static ModelResMessage sendChat(List<Map<String, String>> messages) throws Exception {
         Map<String, Object> body = new HashMap<>();
         body.put("model", MODEL);
         body.put("messages", messages);
@@ -59,25 +58,28 @@ public class LLaMAServerCtrl {
                 // ===== 解析 OpenAI 格式 =====
                 List<?> choices = (List<?>) result.get("choices");
                 if (choices == null || choices.isEmpty()) {
-                    return "No response";
+                    return new ModelResMessage();
                 }
 
-                System.out.println("respond choices: "  + choices);
+                System.out.println("respond choices: " + choices);
                 Map<?, ?> choice0 = (Map<?, ?>) choices.get(0);
                 Map<?, ?> message = (Map<?, ?>) choice0.get("message");
 
-                return (String) message.get("content");
-            }catch (Exception e){
+                ModelResMessage modelResMessage = new ModelResMessage();
+                modelResMessage.setContent((String) message.get("content"));
+                modelResMessage.setReasoningContent((String) message.get("reasoning_content"));
+                return modelResMessage;
+            } catch (Exception e) {
                 LogUtils.error("sendChat error: " + e.toString());
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             LogUtils.error("sendChat error2: " + e.toString());
         }
-        return "error!";
+        return new ModelResMessage();
     }
 
 
-    public static void startLLaMAServer(){
+    public static void startLLaMAServer() {
         try {
 //            String command = "/Users/megan/Downloads/llama-b8149/llama-server --host localhost --port 8080 -m /Users/megan/Downloads/waterchat/resources/models/Qwen3-0.6B-GGUF/Qwen3-0.6B-Q8_0.gguf" +
 //                    " -ngl 0 --temp 0.6 --top-k 20 --top-p 0.95 --min-p 0.05 --presence-penalty 1.2 -c 16384 -n 4096 --jinja --no-context-shift";
@@ -85,17 +87,16 @@ public class LLaMAServerCtrl {
             String llamaExecPath = LLaMAConf.getLLaMAExecAbsPath();
             // 使用自定义的llama路径，用户自行设定 cuda llama.ccp的路径
             if (!allConfigKeyValue.isEmpty() && !allConfigKeyValue.get("llama_custom_path").isEmpty()
-                    && !allConfigKeyValue.get("llama_custom_path").equals("*")){
+                    && !allConfigKeyValue.get("llama_custom_path").equals("*")) {
                 llamaExecPath = allConfigKeyValue.get("llama_custom_path");
             }
 
             String command2 = llamaExecPath + "/llama-server" + " --host "
                     + LLaMAConf.LLAMA_SERVER_HOST
                     + " --port " + LLaMAConf.LLAMA_SERVER_PORT
-                    + " -m " +  SysConfig.TEMP_RESOURCES_PATH + "models/" +  MODEL + "/Qwen3-0.6B-Q8_0.gguf"
-                    ;
+                    + " -m " + SysConfig.TEMP_RESOURCES_PATH + "models/" + MODEL + "/Qwen3-0.6B-Q8_0.gguf";
             String lLaMAParams = assembleLLaMAParams(allConfigKeyValue);
-            if (!lLaMAParams.isEmpty()){
+            if (!lLaMAParams.isEmpty()) {
                 command2 = command2 + " " + lLaMAParams;
             }
 
@@ -124,6 +125,12 @@ public class LLaMAServerCtrl {
                     String line;
                     while ((line = reader.readLine()) != null) {
                         LogUtils.info("llama output msg: " + line);
+                        if (line.contains("server is listening on")
+                                || line.contains("starting the main loop")
+                                || line.contains(LLaMAConf.LLAMA_SERVER_HOST + ":" + LLaMAConf.LLAMA_SERVER_PORT)) {
+                            LogUtils.info("IS_LLAMA_SERVER_STARTED: true");
+                            LLaMAConf.IS_LLAMA_SERVER_STARTED = true;
+                        }
                         LogUtils.log2LocalLogFile("llama output msg: " + line);
                     }
                 } catch (Exception e) {
@@ -136,7 +143,13 @@ public class LLaMAServerCtrl {
         }
     }
 
-    public static void shutdownLLaMAServer(){
+    public static void restartLLaMAServer() {
+        LogUtils.info("restartLLaMAServer");
+        LLaMAServerCtrl.shutdownLLaMAServer();
+        LLaMAServerCtrl.startLLaMAServer();
+    }
+
+    public static void shutdownLLaMAServer() {
         if (process != null) {
             process.destroy();
             try {
@@ -151,23 +164,56 @@ public class LLaMAServerCtrl {
     }
 
     public static String callLLaMAServer() throws Exception {
+        callLLaMAServerDetection();
         List<Map<String, String>> messages = new ArrayList<>();
-        return sendChat(HomepageAdaptor.assembleMsg(messages));
+        ModelResMessage modelResMessage = sendChat(HomepageAdaptor.assembleMsg(messages));
+        return assembleModelResMessage(modelResMessage);
     }
 
-    public static String getLLaMARealExecAbsPath(){
+    public static String assembleModelResMessage(ModelResMessage modelResMessage) {
+        String msg = "";
+        if (modelResMessage.getContent() != null && !modelResMessage.getContent().isEmpty()) {
+            msg = msg + modelResMessage.getContent();
+        }
+        if (modelResMessage.getReasoningContent() != null && !modelResMessage.getReasoningContent().isEmpty()) {
+            msg = msg + "\n\n\n\n\n********************************************************************\n" +
+                    "其中，AI思考过程：\n" + modelResMessage.getReasoningContent();
+        }
+        return msg;
+    }
+
+
+    public static void callLLaMAServerDetection() {
+        for (int i = 0; i < 10; i++) {
+            if (LLaMAConf.IS_LLAMA_SERVER_STARTED) {
+                LogUtils.info("LLAMA_SERVER 已经启动！");
+                break;
+            } else {
+                try {
+                    Thread.sleep(1000);
+                    LogUtils.info("等待 LLAMA_SERVER 启动...");
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+    }
+
+
+    public static String getLLaMARealExecAbsPath() {
         HashMap<String, String> allConfigKeyValue = SysConfigAction.getAllConfigKeyValue();
         String llamaExecPath = LLaMAConf.getLLaMAExecAbsPath();
         // 使用自定义的llama路径，用户自行设定 cuda llama.ccp的路径
         if (!allConfigKeyValue.isEmpty() && !allConfigKeyValue.get("llama_custom_path").isEmpty()
-                && !allConfigKeyValue.get("llama_custom_path").equals("*")){
+                && !allConfigKeyValue.get("llama_custom_path").equals("*")) {
             llamaExecPath = allConfigKeyValue.get("llama_custom_path");
         }
 
         return llamaExecPath;
     }
 
-    private static String assembleLLaMAParams(HashMap<String, String> allConfigKeyValue){
+    private static String assembleLLaMAParams(HashMap<String, String> allConfigKeyValue) {
         String ngl = "0";
         String temp = "0.6";
         String topK = "20";
@@ -177,63 +223,63 @@ public class LLaMAServerCtrl {
         String c = "16384";
         String n = "4096";
         for (String key : allConfigKeyValue.keySet()) {
-            if ("-ngl".equals(key)){
+            if ("-ngl".equals(key)) {
                 ngl = allConfigKeyValue.get(key);
                 continue;
             }
-            if ("--temp".equals(key)){
+            if ("--temp".equals(key)) {
                 temp = allConfigKeyValue.get(key);
                 continue;
             }
-            if ("--top-k".equals(key)){
+            if ("--top-k".equals(key)) {
                 topK = allConfigKeyValue.get(key);
                 continue;
             }
-            if ("--top-p".equals(key)){
+            if ("--top-p".equals(key)) {
                 topP = allConfigKeyValue.get(key);
                 continue;
             }
-            if ("--min-p".equals(key)){
+            if ("--min-p".equals(key)) {
                 minP = allConfigKeyValue.get(key);
                 continue;
             }
-            if ("--presence-penalty".equals(key)){
+            if ("--presence-penalty".equals(key)) {
                 presencePenalty = allConfigKeyValue.get(key);
                 continue;
             }
-            if ("-c".equals(key)){
+            if ("-c".equals(key)) {
                 c = allConfigKeyValue.get(key);
                 continue;
             }
-            if ("-n".equals(key)){
+            if ("-n".equals(key)) {
                 n = allConfigKeyValue.get(key);
                 continue;
             }
         }
 
         String llamaParams = "";
-        if (!"*".equals(ngl)){
+        if (!"*".equals(ngl)) {
             llamaParams = llamaParams + "-ngl " + ngl;
         }
-        if (!"*".equals(temp)){
+        if (!"*".equals(temp)) {
             llamaParams = llamaParams + " " + "--temp " + temp;
         }
-        if (!"*".equals(topK)){
+        if (!"*".equals(topK)) {
             llamaParams = llamaParams + " " + "--top-k " + topK;
         }
-        if (!"*".equals(topP)){
+        if (!"*".equals(topP)) {
             llamaParams = llamaParams + " " + "--top-p " + topP;
         }
-        if (!"*".equals(minP)){
+        if (!"*".equals(minP)) {
             llamaParams = llamaParams + " " + "--min-p " + minP;
         }
-        if (!"*".equals(presencePenalty)){
+        if (!"*".equals(presencePenalty)) {
             llamaParams = llamaParams + " " + "--presence-penalty " + presencePenalty;
         }
-        if (!"*".equals(c)){
+        if (!"*".equals(c)) {
             llamaParams = llamaParams + " " + "-c " + c;
         }
-        if (!"*".equals(n)){
+        if (!"*".equals(n)) {
             llamaParams = llamaParams + " " + "-n " + n;
         }
 
