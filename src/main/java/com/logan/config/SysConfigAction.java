@@ -1,11 +1,15 @@
 package com.logan.config;
 
 import com.logan.App;
-import com.logan.chat.LLaMAServerCtrl;
 import com.logan.utils.LogUtils;
 
 import javax.swing.filechooser.FileSystemView;
 import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -40,7 +44,7 @@ public class SysConfigAction {
     public static HashMap<String, String> parseKeyValueFile(String filePath) throws IOException {
         HashMap<String, String> resultMap = new HashMap<>();
         FileInputStream fileInputStream = new FileInputStream(filePath);
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(fileInputStream))) {
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(fileInputStream, StandardCharsets.UTF_8))) {
             String line;
             while ((line = reader.readLine()) != null) {
                 String[] parts = line.split("=");
@@ -113,21 +117,24 @@ public class SysConfigAction {
     }
 
     public static void updateConfigValue(String filePath, String key, String newValue) throws IOException {
-        // 读取文件内容
-        BufferedReader reader = new BufferedReader(new FileReader(filePath));
+        Path path = Paths.get(filePath);
         StringBuilder content = new StringBuilder();
-        String line;
-        while ((line = reader.readLine()) != null) {
-            if (line.startsWith(key + "=")) {
-                line = key + "=" + newValue;
+        String prefix = key + "=";
+
+        // 讀取 - 使用 UTF-8
+        try (BufferedReader reader = Files.newBufferedReader(path, StandardCharsets.UTF_8)) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                if (line.startsWith(prefix)) {
+                    line = prefix + newValue;
+                }
+                content.append(line).append("\n");
             }
-            content.append(line).append("\n");
         }
-        reader.close();
-        // 写入修改后的内容
-        BufferedWriter writer = new BufferedWriter(new FileWriter(filePath));
-        writer.write(content.toString());
-        writer.close();
+        // 寫入 - 使用 UTF-8
+        try (BufferedWriter writer = Files.newBufferedWriter(path, StandardCharsets.UTF_8)) {
+            writer.write(content.toString());
+        }
     }
 
 
