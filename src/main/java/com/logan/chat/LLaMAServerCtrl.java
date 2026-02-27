@@ -24,14 +24,19 @@ import java.util.concurrent.TimeUnit;
 public class LLaMAServerCtrl {
     public static Process process;
     private static final String BASE_URL = LLaMAConf.LLAMA_SERVER_BASE_URL;
-    private static final String MODEL = LLaMAConf.LLAMA_SERVER_BASE_MODEL;
+    private static String CURRENT_MODEL = LLaMAConf.LLAMA_SERVER_BASE_MODEL;
     // 如果服务不需要 API Key 可留空
     private static final String API_KEY = "********";
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
+
+    private static void refreshCurrentModel(){
+        CURRENT_MODEL = SysConfig.MODEL_NAME;
+    }
+
     public static ModelResMessage sendChat(List<Map<String, String>> messages) throws Exception {
         Map<String, Object> body = new HashMap<>();
-        body.put("model", MODEL);
+        body.put("model", CURRENT_MODEL);
         body.put("messages", messages);
         body.put("temperature", 0.7);
 
@@ -83,6 +88,9 @@ public class LLaMAServerCtrl {
         try {
 //            String command = "/Users/megan/Downloads/llama-b8149/llama-server --host localhost --port 8080 -m /Users/megan/Downloads/waterchat/resources/models/Qwen3-0.6B-GGUF/Qwen3-0.6B-Q8_0.gguf" +
 //                    " -ngl 0 --temp 0.6 --top-k 20 --top-p 0.95 --min-p 0.05 --presence-penalty 1.2 -c 16384 -n 4096 --jinja --no-context-shift";
+
+            refreshCurrentModel();
+
             HashMap<String, String> allConfigKeyValue = SysConfigAction.getAllConfigKeyValue();
             String llamaExecPath = LLaMAConf.getLLaMAExecAbsPath();
             // 使用自定义的llama路径，用户自行设定 cuda llama.ccp的路径
@@ -94,7 +102,7 @@ public class LLaMAServerCtrl {
             String command2 = llamaExecPath + "/llama-server" + " --host "
                     + LLaMAConf.LLAMA_SERVER_HOST
                     + " --port " + LLaMAConf.LLAMA_SERVER_PORT
-                    + " -m " + SysConfig.TEMP_RESOURCES_PATH + "models/" + MODEL + "/Qwen3-0.6B-Q8_0.gguf";
+                    + " -m " + SysConfig.TEMP_RESOURCES_PATH + "models/" + CURRENT_MODEL;
             String lLaMAParams = assembleLLaMAParams(allConfigKeyValue);
             if (!lLaMAParams.isEmpty()) {
                 command2 = command2 + " " + lLaMAParams;

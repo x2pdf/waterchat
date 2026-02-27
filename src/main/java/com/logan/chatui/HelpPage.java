@@ -153,6 +153,7 @@ public class HelpPage {
                     LogUtils.info("选择模型：" + SysConfig.MODEL_NAME_LIST.get(0));
                 }
                 SysConfigAction.refreshConfig();
+
             } catch (IOException e) {
                 e.printStackTrace();
             }
