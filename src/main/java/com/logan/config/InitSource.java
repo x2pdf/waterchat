@@ -49,7 +49,7 @@ public class InitSource {
                 deleteFile(SysConfig.TEMP_RESOURCES_PATH + SysConfig.MODEL_EXEC_PATH + "/llama-mac-x64.tar.gz");
             } else {
                 // windows 使用zip压缩文件
-                unzipToSameDirectory(llamaExecPath + ".tar.gz");
+                unzipToSameDirectory(llamaExecPath + ".zip");
             }
         } catch (Exception e) {
             LogUtils.error("unzipLLaMAFile exception. info: " + e);
