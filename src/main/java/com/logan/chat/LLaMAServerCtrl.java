@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.logan.chatui.HomepageAdaptor;
 import com.logan.config.SysConfig;
 import com.logan.config.SysConfigAction;
+import com.logan.utils.AlertUtils;
 import com.logan.utils.LogUtils;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
@@ -147,7 +148,14 @@ public class LLaMAServerCtrl {
                 }
             }).start();
         } catch (Exception e) {
+            LogUtils.info("startLLaMAServer Exception: " + e);
             e.printStackTrace();
+
+            String errorStr = e.toString();
+            if (errorStr.contains("llama-win-vulkan-x64/llama-server") && SysConfig.IS_USE_VULKAN){
+                AlertUtils.msg("您电脑的环境目前不支持在 Vulkan 模式下运行。目前应用处于异常运行状态。 请关闭Vulkan 模式，回到默认设定。 谢谢！");
+            }
+
         }
     }
 
