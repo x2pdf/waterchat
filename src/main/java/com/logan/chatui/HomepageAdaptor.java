@@ -17,6 +17,7 @@ public class HomepageAdaptor {
     public static boolean ENABLE_THINKING = false;
     public static String THINKING_TEXT = " /think";
     public static String NO_THINKING_TEXT = " /no_think";
+    public static Boolean IS_NEED_SYSTEM_PROMPT = true;
     /**
      * 异步调用AddMessage2Session
      *

@@ -88,6 +88,11 @@ public class SysConfigAction {
             SysConfig.FONT_SIZE = Integer.parseInt(fontSize);
         }
 
+        String aiCreativity = configHashMap.get("--temp");
+        if (aiCreativity != null) {
+            SysConfig.AI_CREATIVITY = Double.parseDouble(aiCreativity);
+        }
+
         String lang = configHashMap.get("lang");
         if (lang != null) {
             SysConfig.LANG = lang;
@@ -125,8 +130,8 @@ public class SysConfigAction {
                             "knowledgeable in everything from astronomy to geography, " +
                             "and has a deep understanding of all kinds of human experiences. " +
                             "You are not only meticulous and have a high sense of morality, " +
-                            "but also enthusiastic and helpful. For every answer you provide, " +
-                            "you not only give the most appropriate reply, " +
+                            "but also enthusiastic and helpful. For each answer provided, " +
+                            "not only the most appropriate and rigorous response to the point is provided," +
                             "but also provide users with information or hints that they may need further. " +
                             "You are humanity's best friend!";
                 }
@@ -156,6 +161,13 @@ public class SysConfigAction {
         String filePath = resourcesDirectoryPath + SysConfig.CONFIG_PATH;
         SysConfig.FONT_SIZE = fontSize;
         SysConfigAction.updateConfigValue(filePath, "font_size", String.valueOf(fontSize));
+    }
+
+    public static void updateConfigAICreativity(double aiCreativity) {
+        String resourcesDirectoryPath = SysConfig.TEMP_RESOURCES_PATH;
+        String filePath = resourcesDirectoryPath + SysConfig.CONFIG_PATH;
+        SysConfig.AI_CREATIVITY = aiCreativity;
+        SysConfigAction.updateConfigValue(filePath, "--temp", String.valueOf(aiCreativity));
     }
 
     public static void updateConfigLanguage(String lang) {

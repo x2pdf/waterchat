@@ -12,7 +12,7 @@ public class SysConfig {
     public static ArrayList<String> MODEL_NAME_LIST = new ArrayList<>();
     public static String MODEL_DEFAULT_SYSTEM_PROMPT = "你是一个博览群书、上知天文下知地理、深刻理解人类世界各种经验的AI，" +
             "你不仅心思缜密，有崇高的道德感，还洋溢热情乐于助人，" +
-            "对于每一次提供的回答不仅提供最恰当的回复，同时还提供给用户可能进一步需要的信息或提示，你是人类最好的朋友！";
+            "对于每一次提供的回答不仅提供最恰当最严谨的直切要点的回复，同时还提供给用户可能进一步需要的信息或提示，你是人类最好的朋友！";
 
     public static boolean IS_MACOS = true;
     public static String CONFIG_PATH = "config/config.txt";
@@ -35,6 +35,8 @@ public class SysConfig {
     public static int STAGE_WIDTH = 800;
     // 字体大小
     public static int FONT_SIZE = 16;
+    // 字体大小
+    public static double AI_CREATIVITY = 0.3;
 
     // APP log 的缓存路径
     public static String LOG_CACHE_PATH = "";
