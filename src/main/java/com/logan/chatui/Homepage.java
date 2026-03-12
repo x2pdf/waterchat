@@ -5,6 +5,7 @@ import com.logan.chat.Message;
 import com.logan.chat.RoleEnum;
 import com.logan.chat.SessionCtrl;
 import com.logan.config.SysConfig;
+import com.logan.config.SysConfigAction;
 import com.logan.utils.LogUtils;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -39,7 +40,7 @@ public class Homepage {
         stackPane.setAlignment(Pos.BOTTOM_CENTER);
         stackPane.getChildren().add(textAreaInput);
 
-        Button buttonSend = new Button("发送");
+        Button buttonSend = new Button(SysConfigAction.getLang("send"));
         buttonSend.setPrefWidth(200);
         buttonSend.setStyle("-fx-background-color: #3A5FCD;");
 
@@ -59,7 +60,7 @@ public class Homepage {
             }
         });
 
-        Button buttonNewChat = new Button("新对话");
+        Button buttonNewChat = new Button(SysConfigAction.getLang("newChat"));
         buttonNewChat.setOnAction(event -> {
             LogUtils.info("buttonNewChat ");
             if (isTextAreaInputFreeze) {
@@ -69,7 +70,7 @@ public class Homepage {
         });
 
 
-        Button buttonOpenDeviceBrowser = new Button("在浏览器中和AI对话");
+        Button buttonOpenDeviceBrowser = new Button(SysConfigAction.getLang("chatInExplorer"));
         buttonOpenDeviceBrowser.setOnAction(event -> {
             LogUtils.info("buttonOpenDeviceBrowser ");
             try {
@@ -80,7 +81,7 @@ public class Homepage {
             }
         });
 
-        CheckBox enableThinking = new CheckBox("Thinking");
+        CheckBox enableThinking = new CheckBox(SysConfigAction.getLang("thinkingMode"));
         enableThinking.setOnAction(e -> {
             if (enableThinking.isSelected()) {
                 HomepageAdaptor.ENABLE_THINKING = true;
@@ -95,7 +96,7 @@ public class Homepage {
         Region spacer = new Region();
         HBox.setHgrow(spacer, javafx.scene.layout.Priority.ALWAYS);
 
-        HBox buttonBox = new HBox(buttonOpenDeviceBrowser, spacer,enableThinking, buttonNewChat, buttonSend);
+        HBox buttonBox = new HBox(buttonOpenDeviceBrowser, spacer, enableThinking, buttonNewChat, buttonSend);
         buttonBox.setSpacing(5);
         buttonBox.setAlignment(Pos.BASELINE_CENTER);
 
@@ -129,6 +130,7 @@ public class Homepage {
             TextArea messageBox = createMessageBox(message.getContent());
             // 重建對話box
             styleTextArea(messageBox, message.getRole());
+            fontSizeTextArea(messageBox, SysConfig.FONT_SIZE);
             vbox.getChildren().add(messageBox);
         }
 
@@ -177,9 +179,17 @@ public class Homepage {
 
     public static void freezeInputTextArea() {
         textAreaInput.clear();     // clear輸入框内容
-        textAreaInput.setText("正在努力处理您的请求......\n等待中不可再输入文本哦～\n请耐心等待～～～～");
+        textAreaInput.setText(getFreezeInputTextByLanguage(SysConfig.LANG));
         textAreaInputNoEditable();
         isTextAreaInputFreeze = true;
+    }
+
+    public static String getFreezeInputTextByLanguage(String lang){
+        if ("cn".equals(lang)){
+            return "正在努力处理您的请求......\n等待中不可再输入文本哦～\n请耐心等待～～～～";
+        }else {
+            return "Your request is being processed... You cannot enter text while waiting. Please wait patiently.";
+        }
     }
 
     public static void unfreezeInputTextArea() {
@@ -189,10 +199,33 @@ public class Homepage {
     }
 
     private static void styleTextArea(TextArea textArea, RoleEnum roleEnum) {
-        if (RoleEnum.system.equals(roleEnum)) {
-            textArea.setStyle("-fx-padding: 4; -fx-background-color: #f0f0f0; -fx-border-color: #d3d3d3;");
+        if (RoleEnum.user.equals(roleEnum)) {
+            textArea.setStyle(
+                    "-fx-background-color: #f0f0f0; " +
+                            "-fx-control-inner-background: #DCDCDC;" +
+                            "-fx-background-insets: 0; " +
+                            "-fx-background-radius: 0; " +
+                            "-fx-padding: 2; " +
+                            "-fx-border-color: #d3d3d3;"
+            );
         } else {
-            textArea.setStyle("-fx-padding: 4; -fx-background-color: #C8C8C8; -fx-border-color: #d3d3d3;");
+            textArea.setStyle(
+                    "-fx-background-color: #f0f0f0; " +
+                            "-fx-background-insets: 0; " +
+                            "-fx-background-radius: 0; " +
+                            "-fx-padding: 2; " +
+                            "-fx-border-color: #d3d3d3;"
+            );
+        }
+    }
+
+
+    private static void fontSizeTextArea(TextArea textArea, int fontSize) {
+        String currentStyle = textArea.getStyle();
+        if (fontSize > 0) {
+            textArea.setStyle(currentStyle + " -fx-font-size: " + String.valueOf(fontSize) + "px;");
+        } else {
+            textArea.setStyle(currentStyle + " -fx-font-size: 16px;");
         }
     }
 
@@ -207,13 +240,18 @@ public class Homepage {
             row = row + 20;
         } else if (lines < 200) {
             row = row + 50;
-        } else {
-            row = row + 100;
+        } else if (lines < 400) {
+            row = row + 80;
+        }else if (lines < 800) {
+            row = row + 120;
+        }else if (lines < 1200) {
+            row = row + 200;
+        }else {
+            row = row + 300;
         }
 
         int wordsPrefRows = countWordsPrefRows(msgText);
         row = Math.max(wordsPrefRows, row);
-//        System.out.println("setTextAreaPrefRow: " + row);
         return row;
     }
 

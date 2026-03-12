@@ -1,7 +1,9 @@
 package com.logan.config;
 
 
+import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class SysConfig {
     public static String APP_NAME = "WaterChat";
@@ -31,14 +33,23 @@ public class SysConfig {
     public static int STAGE_HEIGHT = 600;
     // 宽度
     public static int STAGE_WIDTH = 800;
+    // 字体大小
+    public static int FONT_SIZE = 16;
 
     // APP log 的缓存路径
     public static String LOG_CACHE_PATH = "";
 
     public static String TEMP_RESOURCES_PATH = "";
 
+    // 应用语言,默认cn, 可选的值为：cn, en
+    public static String LANG = "cn";
+    // 语言map，映射语言使用
+    public static HashMap<String, String> LANG_MAP = new HashMap<>();
+    // 语言文件的缓存路径
+    public static String LANG_CACHE_PATH = TEMP_RESOURCES_PATH + "language" + File.separator;
+
     // AI对话日志的文件名称
-    public static String SESSION_LOG_FILE_NAME = "water_chat_session_log.txt";
+    public static String SESSION_LOG_FILE_NAME = "chat_log_water_chat_session.txt";
 
     // 应用日志的文件名称
     public static String APP_LOG_FILE_NAME = "app_server_log.txt";
