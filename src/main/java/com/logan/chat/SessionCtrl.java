@@ -47,9 +47,11 @@ public class SessionCtrl {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("\n\n\n").append("**************************************").append("\n")
                 .append(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").format(LocalDateTime.now()))
-                .append("\n\n");
+                .append("\n")
+                .append(SysConfig.MODEL_NAME)
+                .append("\n\n\n");
         for (Message message : messages) {
-            stringBuilder.append(message.getRole()).append(":  ").append(message.getContent()).append("\n");
+            stringBuilder.append(message.getRole()).append(":\n").append(message.getContent()).append("\n\n\n");
         }
         try {
             LocalFileUtils.appendToMessageFile(stringBuilder.toString(), SysConfigAction.createAppLocalPath() + SysConfig.SESSION_LOG_FILE_NAME);

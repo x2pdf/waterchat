@@ -7,12 +7,15 @@ import com.logan.chat.SessionCtrl;
 import com.logan.config.SysConfig;
 import com.logan.config.SysConfigAction;
 import com.logan.utils.LogUtils;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextArea;
+import javafx.scene.input.Clipboard;
 import javafx.scene.layout.*;
 
 import java.awt.*;
@@ -49,6 +52,18 @@ public class Homepage {
                 return;
             }
             String msg = textAreaInput.getText();
+            if (msg == null || msg.isEmpty()) {
+                // 输入框为空 → 尝试从剪贴板获取文本
+                Clipboard clipboard = Clipboard.getSystemClipboard();
+                if (clipboard.hasString()) {           // 优先检查有没有字符串
+                    String copyText = clipboard.getString();
+                    // 可选：再检查是否为空或只有空白
+                    if (copyText != null && !copyText.trim().isEmpty()) {
+                        // 这里就是你想要的 copyText
+                        msg = copyText;
+                    }
+                }
+            }
             LogUtils.info("======== input msg: " + textAreaInput.getText());
             if (msg != null && !msg.isEmpty()) {
                 // 消息加入到本地缓存list
@@ -81,6 +96,36 @@ public class Homepage {
             }
         });
 
+        CheckBox isNeedSystemPrompt = new CheckBox(SysConfigAction.getLang("isNeedSystemPrompt"));
+        isNeedSystemPrompt.setSelected(true);   // 这句让它默认勾选
+        isNeedSystemPrompt.setOnAction(e -> {
+            if (isNeedSystemPrompt.isSelected()) {
+                HomepageAdaptor.IS_NEED_SYSTEM_PROMPT = true;
+                boolean isHasSystemPrompt = false;
+                for (Message message : SessionCtrl.messages) {
+                    if (message.getRole().equals(RoleEnum.system)) {
+                        isHasSystemPrompt = true;
+                    }
+                }
+                if (!isHasSystemPrompt) {
+                    Message message = new Message();
+                    message.setRole(RoleEnum.system);
+                    message.setContent(SysConfig.MODEL_DEFAULT_SYSTEM_PROMPT);
+                    SessionCtrl.messages.add(0, message);
+                }
+                LogUtils.info("isNeedSystemPrompt 功能已启用");
+            } else {
+                HomepageAdaptor.IS_NEED_SYSTEM_PROMPT = false;
+                Message message = SessionCtrl.messages.get(0);
+                if (message.getRole().equals(RoleEnum.system)) {
+                    SessionCtrl.messages.remove(0);
+                }
+                LogUtils.info("isNeedSystemPrompt 功能已关闭");
+            }
+
+            HomepageAdaptor.freshChatMsgBox();
+        });
+
         CheckBox enableThinking = new CheckBox(SysConfigAction.getLang("thinkingMode"));
         enableThinking.setOnAction(e -> {
             if (enableThinking.isSelected()) {
@@ -96,7 +141,7 @@ public class Homepage {
         Region spacer = new Region();
         HBox.setHgrow(spacer, javafx.scene.layout.Priority.ALWAYS);
 
-        HBox buttonBox = new HBox(buttonOpenDeviceBrowser, spacer, enableThinking, buttonNewChat, buttonSend);
+        HBox buttonBox = new HBox(buttonOpenDeviceBrowser, spacer, isNeedSystemPrompt, enableThinking, buttonNewChat, buttonSend);
         buttonBox.setSpacing(5);
         buttonBox.setAlignment(Pos.BASELINE_CENTER);
 
@@ -127,6 +172,10 @@ public class Homepage {
         for (int i = 0; i < msgSize; i++) {
             // 獲取新的所有消息
             Message message = SessionCtrl.messages.get(i);
+            // 移除系统提示语
+            if (!HomepageAdaptor.IS_NEED_SYSTEM_PROMPT && message.getRole().equals(RoleEnum.system)) {
+                continue;
+            }
             TextArea messageBox = createMessageBox(message.getContent());
             // 重建對話box
             styleTextArea(messageBox, message.getRole());
@@ -184,10 +233,10 @@ public class Homepage {
         isTextAreaInputFreeze = true;
     }
 
-    public static String getFreezeInputTextByLanguage(String lang){
-        if ("cn".equals(lang)){
+    public static String getFreezeInputTextByLanguage(String lang) {
+        if ("cn".equals(lang)) {
             return "正在努力处理您的请求......\n等待中不可再输入文本哦～\n请耐心等待～～～～";
-        }else {
+        } else {
             return "Your request is being processed... You cannot enter text while waiting. Please wait patiently.";
         }
     }
@@ -242,11 +291,11 @@ public class Homepage {
             row = row + 50;
         } else if (lines < 400) {
             row = row + 80;
-        }else if (lines < 800) {
+        } else if (lines < 800) {
             row = row + 120;
-        }else if (lines < 1200) {
+        } else if (lines < 1200) {
             row = row + 200;
-        }else {
+        } else {
             row = row + 300;
         }
 

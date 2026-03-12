@@ -51,6 +51,7 @@ public class HelpPage {
     public HBox getBoxHelp() {
         ChoiceBox modelsChoiceBox = getModelsChoiceBox();
         ChoiceBox fontSizeChoiceBox = getFontSizeChoiceBox();
+        ChoiceBox aiCreativityChoiceBox = getAICreativityChoiceBox();
         ChoiceBox logChoiceBox = getLogChoiceBox();
         ChoiceBox langChoiceBox = getLangChoiceBox();
 
@@ -92,10 +93,10 @@ public class HelpPage {
         Text allRight = new Text("All Rights Reserved.");
         VBox vBox;
         if (SysConfig.IS_MACOS) {
-            vBox = new VBox(modelsChoiceBox, logChoiceBox, langChoiceBox, fontSizeChoiceBox, sessionLogButton, tipsButton, productIntroductionButton, adv, version, allRight);
+            vBox = new VBox(modelsChoiceBox, logChoiceBox, langChoiceBox, fontSizeChoiceBox, aiCreativityChoiceBox, sessionLogButton, tipsButton, productIntroductionButton, adv, version, allRight);
         } else {
             ChoiceBox vulkanChoiceBox = getVulkanChoiceBox();
-            vBox = new VBox(modelsChoiceBox, logChoiceBox, langChoiceBox, fontSizeChoiceBox, vulkanChoiceBox, sessionLogButton, tipsButton, productIntroductionButton, adv, version, allRight);
+            vBox = new VBox(modelsChoiceBox, logChoiceBox, langChoiceBox, fontSizeChoiceBox, aiCreativityChoiceBox, vulkanChoiceBox, sessionLogButton, tipsButton, productIntroductionButton, adv, version, allRight);
         }
 
         vBox.setAlignment(Pos.CENTER);
@@ -114,7 +115,7 @@ public class HelpPage {
     }
 
     public static String getTipsMsg() {
-        if (SysConfig.LANG.equals("cn")){
+        if (SysConfig.LANG.equals("cn")) {
             return "1. 应用在调用AI大模型期间，应用界面不可操作是正常的，请耐心等候。\n\n"
                     + "2. 如果要自行增加 Qwen3-0.6B-GGUF（默认模型）以外的AI模型，请查看Help页面下“产品介绍”的文档进行操作。\n\n"
                     + "3. 如果询问复杂问题（逻辑推理，代码生成）,那么以CPU运行15亿参数量AI模型时，需要等待（3 ~ 5）分钟也属于正常。\n\n"
@@ -122,7 +123,7 @@ public class HelpPage {
                     + "5. 运行内存(RAM)参考：5亿参数量的AI模型需要内存 >3GB，15亿参数量的AI模型需要内存 >5GB，70亿参数量的AI模型需要内存 >15GB。\n\n"
                     + "6. 本应用占据硬盘空间大是正常的。AI模型参数文件大小参考：5亿参数量～1GB，15亿参数量～4GB，70亿参数量～15GB。\n\n"
                     ;
-        }else {
+        } else {
             return "1. It is normal for the application interface to be unresponsive while calling a large AI model; please wait patiently.\n" +
                     "\n" +
                     "2. If you want to add an AI model other than Qwen3-0.6B-GGUF (the default model), " +
@@ -294,6 +295,55 @@ public class HelpPage {
         return fontSizeChoiceBox;
     }
 
+    public static ChoiceBox getAICreativityChoiceBox() {
+        // hardcode
+        ArrayList<String> AICreavitityChoices = new ArrayList<>();
+        AICreavitityChoices.add(SysConfigAction.getLang("AICreativity") + ": " + "0.1");
+        AICreavitityChoices.add(SysConfigAction.getLang("AICreativity") + ": " + "0.2");
+        AICreavitityChoices.add(SysConfigAction.getLang("AICreativity") + ": " + "0.3");
+        AICreavitityChoices.add(SysConfigAction.getLang("AICreativity") + ": " + "0.4");
+        AICreavitityChoices.add(SysConfigAction.getLang("AICreativity") + ": " + "0.5");
+        AICreavitityChoices.add(SysConfigAction.getLang("AICreativity") + ": " + "0.6");
+        AICreavitityChoices.add(SysConfigAction.getLang("AICreativity") + ": " + "0.7");
+        AICreavitityChoices.add(SysConfigAction.getLang("AICreativity") + ": " + "0.8");
+        AICreavitityChoices.add(SysConfigAction.getLang("AICreativity") + ": " + "0.9");
+        ChoiceBox AICreativityChoiceBox = new ChoiceBox();
+        AICreativityChoiceBox.getItems().addAll(AICreavitityChoices);
+        AICreativityChoiceBox.setValue(SysConfigAction.getLang("AICreativity") + ": " + SysConfig.AI_CREATIVITY);
+        AICreativityChoiceBox.setMinWidth(100);
+        AICreativityChoiceBox.setMaxWidth(120);
+
+        AICreativityChoiceBox.setOnAction((event) -> {
+            int selectedIndex = AICreativityChoiceBox.getSelectionModel().getSelectedIndex();
+            if (selectedIndex == 0) {
+                SysConfig.AI_CREATIVITY = 0.1;
+            } else if (selectedIndex == 1) {
+                SysConfig.AI_CREATIVITY = 0.2;
+            } else if (selectedIndex == 2) {
+                SysConfig.AI_CREATIVITY = 0.3;
+            } else if (selectedIndex == 3) {
+                SysConfig.AI_CREATIVITY = 0.4;
+            } else if (selectedIndex == 4) {
+                SysConfig.AI_CREATIVITY = 0.5;
+            } else if (selectedIndex == 5) {
+                SysConfig.AI_CREATIVITY = 0.6;
+            } else if (selectedIndex == 6) {
+                SysConfig.AI_CREATIVITY = 0.7;
+            } else if (selectedIndex == 7) {
+                SysConfig.AI_CREATIVITY = 0.8;
+            } else if (selectedIndex == 8) {
+                SysConfig.AI_CREATIVITY = 0.9;
+            } else {
+                SysConfig.AI_CREATIVITY = 0.3;
+            }
+
+            SysConfigAction.updateConfigAICreativity(SysConfig.AI_CREATIVITY);
+            LLaMAServerCtrl.restartLLaMAServer();
+        });
+
+        return AICreativityChoiceBox;
+    }
+
 
     public ChoiceBox getLangChoiceBox() {
         ArrayList<String> langChoices = new ArrayList<>();
@@ -302,7 +352,7 @@ public class HelpPage {
 
         ChoiceBox langChoiceBox = new ChoiceBox();
         langChoiceBox.getItems().addAll(langChoices);
-        langChoiceBox.setValue(SysConfig.LANG.equals("cn") ? "语言：中文" : "language: English" );
+        langChoiceBox.setValue(SysConfig.LANG.equals("cn") ? "语言：中文" : "language: English");
 
         langChoiceBox.setMinWidth(140);
         langChoiceBox.setMaxWidth(180);
