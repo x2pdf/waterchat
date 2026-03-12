@@ -22,6 +22,9 @@ public class LLaMAConf {
     public static String LLAMA_SERVER_BASE_URL = "http://" + LLAMA_SERVER_HOST +":" + LLAMA_SERVER_PORT + "/v1/chat/completions";
     public static String LLAMA_SERVER_BASE_MODEL = "Qwen3-0.6B-GGUF/Qwen3-0.6B-Q8_0.gguf";
 
+    public static boolean IS_MODEL_CONTAIN_MMPORJ_FILE = false;
+    public static String MODEL_MMPORJ_FILENAME = "";
+
     public static String getLLaMAExecPath() {
         String os = System.getProperty("os.name").toLowerCase();
         String arch = System.getProperty("os.arch").toLowerCase();
