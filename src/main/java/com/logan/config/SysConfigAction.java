@@ -1,10 +1,10 @@
 package com.logan.config;
 
 import com.logan.App;
+import com.logan.chat.LLaMAConf;
 import com.logan.chatui.HelpPage;
 import com.logan.utils.LocalFileUtils;
 import com.logan.utils.LogUtils;
-import javafx.scene.layout.GridPane;
 
 import javax.swing.filechooser.FileSystemView;
 import java.io.*;
@@ -15,8 +15,6 @@ import java.nio.file.Paths;
 import java.io.IOException;
 import java.util.*;
 
-import static com.logan.config.SysConfig.LANG_CACHE_PATH;
-
 public class SysConfigAction {
 
     public static void initSysConfigValue() {
@@ -24,7 +22,7 @@ public class SysConfigAction {
         createAppLocalPath();
         createAppResourcesPath();
         isConfigExist();
-        initModelsNameAndNameList(SysConfig.TEMP_RESOURCES_PATH + SysConfig.CONFIG_PATH);
+        initSystemConfigValue(SysConfig.TEMP_RESOURCES_PATH + SysConfig.CONFIG_PATH);
         initLang();
     }
 
@@ -60,6 +58,8 @@ public class SysConfigAction {
                 }
             }
         }
+
+        SysConfig.configHashMap = resultMap;
         return resultMap;
     }
 
@@ -74,7 +74,7 @@ public class SysConfigAction {
         }
     }
 
-    public static void initModelsNameAndNameList(String configPath) {
+    public static void initSystemConfigValue(String configPath) {
         // 多个模型，配置选项的值
         HashMap<String, String> configHashMap = null;
         try {
@@ -107,6 +107,12 @@ public class SysConfigAction {
         String modelPath = configHashMap.get("model_path");
         if (modelPath != null) {
             SysConfig.MODEL_PATH = modelPath;
+        }
+
+        String modelMmprojFile = configHashMap.get(SysConfig.MODEL_NAME + ":mmproj");
+        if (modelMmprojFile != null && !modelMmprojFile.isEmpty()) {
+            LLaMAConf.IS_MODEL_CONTAIN_MMPORJ_FILE = true;
+            LLaMAConf.MODEL_MMPORJ_FILENAME = modelMmprojFile;
         }
 
         String model_default_system_prompt = configHashMap.get("model_default_system_prompt");

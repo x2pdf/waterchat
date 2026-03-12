@@ -177,6 +177,7 @@ public class HelpPage {
                     LogUtils.info("选择模型：" + SysConfig.MODEL_NAME_LIST.get(0));
                 }
                 SysConfigAction.refreshConfig();
+                LLaMAServerCtrl.refreshModelMmprojInfo();
                 LLaMAServerCtrl.restartLLaMAServer();
             } catch (IOException e) {
                 e.printStackTrace();

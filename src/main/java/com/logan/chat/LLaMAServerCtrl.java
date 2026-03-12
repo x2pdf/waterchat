@@ -104,6 +104,11 @@ public class LLaMAServerCtrl {
                     + LLaMAConf.LLAMA_SERVER_HOST
                     + " --port " + LLaMAConf.LLAMA_SERVER_PORT
                     + " -m " + SysConfig.TEMP_RESOURCES_PATH + "models/" + CURRENT_MODEL;
+
+            if (LLaMAConf.IS_MODEL_CONTAIN_MMPORJ_FILE){
+                command2 = command2 + " --mmproj " + SysConfig.TEMP_RESOURCES_PATH + "models/" + LLaMAConf.MODEL_MMPORJ_FILENAME;
+            }
+
             String lLaMAParams = assembleLLaMAParams(allConfigKeyValue);
             if (!lLaMAParams.isEmpty()) {
                 command2 = command2 + " " + lLaMAParams;
@@ -158,6 +163,19 @@ public class LLaMAServerCtrl {
 
         }
     }
+
+
+    public static void refreshModelMmprojInfo() {
+        String mmprojValue = SysConfig.configHashMap.get(SysConfig.MODEL_NAME + ":mmproj");
+        if ( mmprojValue == null){
+            LLaMAConf.IS_MODEL_CONTAIN_MMPORJ_FILE = false;
+            LLaMAConf.MODEL_MMPORJ_FILENAME = "";
+        }else {
+            LLaMAConf.IS_MODEL_CONTAIN_MMPORJ_FILE = true;
+            LLaMAConf.MODEL_MMPORJ_FILENAME = mmprojValue;
+        }
+    }
+
 
     public static void restartLLaMAServer() {
         LogUtils.info("restartLLaMAServer");

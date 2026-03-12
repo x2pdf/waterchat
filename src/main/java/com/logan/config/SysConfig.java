@@ -54,4 +54,6 @@ public class SysConfig {
     // 应用日志的文件名称
     public static String APP_LOG_FILE_NAME = "app_server_log.txt";
 
+    public static HashMap<String, String> configHashMap = new HashMap<>();
+
 }
