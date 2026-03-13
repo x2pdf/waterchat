@@ -63,6 +63,14 @@ public class HelpPage {
             }
         });
 
+        Button addAIModelButton = new Button(SysConfigAction.getLang("addAIModel"));
+        addAIModelButton.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                AddAIModelWindow.openAddModelWindow();
+            }
+        });
+
         Button tipsButton = new Button(SysConfigAction.getLang("tips"));
         tipsButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
@@ -87,10 +95,14 @@ public class HelpPage {
         Text allRight = new Text("All Rights Reserved.");
         VBox vBox;
         if (SysConfig.IS_MACOS) {
-            vBox = new VBox(modelsChoiceBox, logChoiceBox, langChoiceBox, fontSizeChoiceBox, aiCreativityChoiceBox, sessionLogButton, tipsButton, productIntroductionButton, adv, version, allRight);
+            vBox = new VBox(modelsChoiceBox, addAIModelButton, logChoiceBox, langChoiceBox, fontSizeChoiceBox,
+                    aiCreativityChoiceBox, sessionLogButton,
+                    tipsButton, productIntroductionButton, adv, version, allRight);
         } else {
             ChoiceBox vulkanChoiceBox = HelpPageCheckBox.getVulkanChoiceBox();
-            vBox = new VBox(modelsChoiceBox, logChoiceBox, langChoiceBox, fontSizeChoiceBox, aiCreativityChoiceBox, vulkanChoiceBox, sessionLogButton, tipsButton, productIntroductionButton, adv, version, allRight);
+            vBox = new VBox(modelsChoiceBox, addAIModelButton, logChoiceBox, langChoiceBox, fontSizeChoiceBox,
+                    aiCreativityChoiceBox, vulkanChoiceBox, sessionLogButton,
+                    tipsButton, productIntroductionButton, adv, version, allRight);
         }
 
         vBox.setAlignment(Pos.CENTER);

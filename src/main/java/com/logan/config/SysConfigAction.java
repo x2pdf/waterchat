@@ -7,8 +7,8 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.io.IOException;
-import java.util.*;
+import java.nio.file.StandardOpenOption;
+import java.util.HashMap;
 
 public class SysConfigAction {
 
@@ -46,6 +46,77 @@ public class SysConfigAction {
         return resultMap;
     }
 
+
+    /**
+     * 向已存在的配置文件末尾追加一行配置
+     *
+     * @param configFilePath 配置文件完整路径（例如 "config/app.properties"）
+     * @param appendStr      要追加的内容，例如 "fontSize=16" 或 "theme.color=#FF5500"
+     * @throws IOException 文件读写异常
+     */
+    public static void appendConfigLine(String configFilePath, String appendStr) throws IOException {
+        // 确保追加的内容以换行符结尾（properties 文件通常每行一个配置）
+        String lineToAppend = appendStr.trim();
+        if (!lineToAppend.isEmpty()) {
+            // 如果传入的内容没有包含换行，我们自己加一个
+            if (!lineToAppend.endsWith("\n")) {
+                lineToAppend += "\n";
+            }
+            Path path = Paths.get(configFilePath);
+            // 方式1：推荐 - 使用 Files.write + APPEND 模式（最简洁，Java 7+）
+            Files.write(
+                    path,
+                    lineToAppend.getBytes(StandardCharsets.UTF_8),
+                    StandardOpenOption.APPEND,
+                    StandardOpenOption.CREATE // 如果文件不存在则创建
+            );
+            LogUtils.info("已追加配置: " + appendStr);
+        }
+    }
+
+
+    public static void appendConfigModelNameList(String newModelName) {
+        String resourcesDirectoryPath = SysConfig.TEMP_RESOURCES_PATH;
+        String filePath = resourcesDirectoryPath + SysConfig.CONFIG_PATH;
+
+        String newModelNameList = "";
+        String modelNameList = SysConfig.configHashMap.get("model_name_list");
+        if (!modelNameList.isEmpty()){
+            // 如果已经有同名的情形
+            if (modelNameList.contains(newModelName)){
+                return;
+            }
+            newModelNameList = modelNameList + "," + newModelName;
+        }else {
+            LogUtils.error("model_name_list append error.");
+            newModelNameList = newModelName;
+        }
+        SysConfigAction.updateConfigValue(filePath, "model_name_list", String.valueOf(newModelNameList));
+    }
+
+
+    public static void addConfigModelNameMMProj(String modelName, String nameMmproj) {
+        if (nameMmproj != null && !nameMmproj.isEmpty()){
+            String resourcesDirectoryPath = SysConfig.TEMP_RESOURCES_PATH;
+            String filePath = resourcesDirectoryPath + SysConfig.CONFIG_PATH;
+
+            // 注意需要添加后缀：  ":mmproj"
+            String nameMmprojInConfig = SysConfig.configHashMap.get(modelName + ":mmproj");
+            // 已有，就更新替换
+            if (nameMmprojInConfig != null) {
+                SysConfigAction.updateConfigValue(filePath, modelName + ":mmproj", nameMmproj);
+                return;
+            }
+
+            try {
+                String appendLine = modelName + ":mmproj=" + nameMmproj;
+                appendConfigLine(filePath, appendLine);
+            } catch (IOException e) {
+                LogUtils.error("addConfigModelNameMMProj error: "+ e);
+            }
+        }
+
+    }
 
     public static void updateConfigFontSize(int fontSize) {
         String resourcesDirectoryPath = SysConfig.TEMP_RESOURCES_PATH;
