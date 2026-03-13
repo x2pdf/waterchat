@@ -1,6 +1,9 @@
 package com.logan.utils;
 
 import com.logan.config.SysConfig;
+import javafx.stage.DirectoryChooser;
+import javafx.stage.FileChooser;
+import javafx.stage.Stage;
 
 import java.io.*;
 import java.util.zip.ZipEntry;
@@ -130,4 +133,28 @@ public class FileUtils {
         return dirPath;
     }
 
+    public static String chooseFilePath(Stage stage) {
+        DirectoryChooser directoryChooser = new DirectoryChooser();
+        File file = directoryChooser.showDialog(stage);
+        if (file == null) {
+            return null;
+        }
+        return file.getAbsolutePath();
+    }
+
+    public static String chooseFile(Stage stage) {
+        FileChooser fileChooser = new FileChooser();
+        // 可选：设置初始目录
+//        fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));
+        // 可选：设置文件过滤器（这里示例只允许txt和所有文件）
+//        FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("文本文件 (*.txt)", "*.txt");
+        FileChooser.ExtensionFilter allFilter = new FileChooser.ExtensionFilter("所有文件 (*.*)", "*.*");
+        fileChooser.getExtensionFilters().addAll(allFilter);
+        // 弹出文件选择对话框
+        File file = fileChooser.showOpenDialog(stage);
+        if (file == null) {
+            return null; // 用户取消选择
+        }
+        return file.getAbsolutePath();
+    }
 }
