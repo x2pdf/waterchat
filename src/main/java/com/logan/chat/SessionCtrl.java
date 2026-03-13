@@ -1,12 +1,8 @@
 package com.logan.chat;
 
 
-import com.logan.chat.init.ConfigFileAppInit;
-import com.logan.chat.init.ResourcesFileAppInit;
 import com.logan.chatui.HomepageAdaptor;
-import com.logan.config.InitSourceTemplate;
 import com.logan.config.SysConfig;
-import com.logan.config.SysConfigAction;
 import com.logan.utils.LocalFileUtils;
 import com.logan.utils.LogUtils;
 

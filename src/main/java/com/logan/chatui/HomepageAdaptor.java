@@ -1,9 +1,9 @@
 package com.logan.chatui;
 
-import com.logan.chat.MessageDTO;
-import com.logan.chat.llamaccp.LLaMAServerCtrl;
 import com.logan.chat.ChatRoleEnum;
+import com.logan.chat.MessageDTO;
 import com.logan.chat.SessionCtrl;
+import com.logan.chat.llamaccp.LLaMAServerCtrl;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 

@@ -122,8 +122,8 @@ public class ConfigFileAppInit implements AppInitInterface {
             // 1. 是否存在缓存文件
             ArrayList<File> filesInFold = LocalFileUtils.getFilesInFold(SysConfig.APP_DOWNLOAD_PATH + "language" + File.separator);
             if (filesInFold == null) {
-                HelpPage helpPage = new HelpPage();
-                helpPage.changeLangFile(SysConfig.LANG);
+                ResourcesFileAppInit resourcesFileAppInit = new ResourcesFileAppInit();
+                resourcesFileAppInit.changeLangFile(SysConfig.LANG);
             }
             // 2. 读取文件到内存
             ArrayList<File> filesInFold2 = LocalFileUtils.getFilesInFold(SysConfig.APP_DOWNLOAD_PATH + "language" + File.separator);

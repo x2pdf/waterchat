@@ -10,6 +10,7 @@ import com.logan.utils.LogUtils;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class ResourcesFileAppInit implements AppInitInterface {
 
@@ -124,6 +125,34 @@ public class ResourcesFileAppInit implements AppInitInterface {
         File file = new File(SysConfig.TEMP_RESOURCES_PATH + SysConfig.MODEL_EXEC_PATH);
         if (!file.exists()){
             file.mkdirs();
+        }
+    }
+
+
+    public void changeLangFile(String lang) {
+        try {
+            // 先删除之前的文件
+            String langTemp1 = LocalFileUtils.mkTempDir("language");
+            LocalFileUtils.deleteDirectory(langTemp1);
+            String langTemp = LocalFileUtils.mkTempDir("language");
+
+            if (SysConfig.LANG.equalsIgnoreCase("en")) {
+                LocalFileUtils.save2TempDir(LocalFileUtils.is2Byte(Objects.requireNonNull(getClass().getClassLoader()
+                                .getResourceAsStream("lang/" + "en.properties"))),
+                        langTemp, "en.properties");
+            } else if (SysConfig.LANG.equalsIgnoreCase("cn")) {
+                LocalFileUtils.save2TempDir(LocalFileUtils.is2Byte(Objects.requireNonNull(getClass().getClassLoader()
+                                .getResourceAsStream("lang/" + "cn.properties"))),
+                        langTemp, "cn.properties");
+            } else {
+                LocalFileUtils.save2TempDir(LocalFileUtils.is2Byte(Objects.requireNonNull(getClass().getClassLoader()
+                                .getResourceAsStream("lang/" + "en.properties"))),
+                        langTemp, "en.properties");
+            }
+
+            LogUtils.info("lang change to:" + lang);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
