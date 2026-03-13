@@ -8,5 +8,5 @@ public class Session {
     private String title;
     private String subtitle;
 
-    private ArrayList<Message> messages;
+    private ArrayList<MessageDTO> messageDTOS;
 }

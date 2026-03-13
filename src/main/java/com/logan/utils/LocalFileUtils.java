@@ -1,7 +1,6 @@
 package com.logan.utils;
 
 
-import com.logan.config.InitSource;
 import com.logan.config.SysConfig;
 
 import java.io.*;
@@ -104,9 +103,6 @@ public class LocalFileUtils {
         }
     }
 
-    public static String append2Log(String content) {
-        return append2Log(content, SysConfig.SESSION_LOG_FILE_NAME);
-    }
 
     public static String append2Log(String content, String fileFullName) {
         String targetFile = logPath + fileFullName;
@@ -128,6 +124,7 @@ public class LocalFileUtils {
 
         return targetFile;
     }
+
 
     public static String mkTempResourcesDir(String path) {
         if (path == null || "".equals(path)) {
