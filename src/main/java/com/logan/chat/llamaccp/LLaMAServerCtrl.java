@@ -1,21 +1,14 @@
-package com.logan.chat;
+package com.logan.chat.llamaccp;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.logan.chat.MessageResDTO;
 import com.logan.chatui.HomepageAdaptor;
 import com.logan.config.SysConfig;
 import com.logan.config.SysConfigAction;
 import com.logan.utils.AlertUtils;
 import com.logan.utils.LogUtils;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
 
 import java.io.BufferedReader;
-import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -26,70 +19,14 @@ public class LLaMAServerCtrl {
     public static Process process;
     private static final String BASE_URL = LLaMAConf.LLAMA_SERVER_BASE_URL;
     private static String CURRENT_MODEL = LLaMAConf.LLAMA_SERVER_BASE_MODEL;
-    // 如果服务不需要 API Key 可留空
-    private static final String API_KEY = "********";
-    private static final ObjectMapper MAPPER = new ObjectMapper();
-
-
     private static void refreshCurrentModel(){
         CURRENT_MODEL = SysConfig.MODEL_NAME;
     }
-
-    public static ModelResMessage sendChat(List<Map<String, String>> messages) throws Exception {
-        Map<String, Object> body = new HashMap<>();
-        body.put("model", CURRENT_MODEL);
-        body.put("messages", messages);
-        body.put("temperature", 0.7);
-
-        String json = MAPPER.writeValueAsString(body);
-
-        LogUtils.info("req body json: " + json);
-
-        try (CloseableHttpClient client = HttpClients.createDefault()) {
-
-            HttpPost post = new HttpPost(BASE_URL);
-            post.setHeader("Content-Type", "application/json");
-
-            if (API_KEY != null && !API_KEY.isEmpty()) {
-                post.setHeader("Authorization", "Bearer " + API_KEY);
-            }
-
-            post.setEntity(new StringEntity(json, StandardCharsets.UTF_8));
-
-            try (CloseableHttpResponse response = client.execute(post)) {
-
-                InputStream is = response.getEntity().getContent();
-                Map<?, ?> result = MAPPER.readValue(is, Map.class);
-
-                // ===== 解析 OpenAI 格式 =====
-                List<?> choices = (List<?>) result.get("choices");
-                if (choices == null || choices.isEmpty()) {
-                    return new ModelResMessage();
-                }
-
-                System.out.println("respond choices: " + choices);
-                Map<?, ?> choice0 = (Map<?, ?>) choices.get(0);
-                Map<?, ?> message = (Map<?, ?>) choice0.get("message");
-
-                ModelResMessage modelResMessage = new ModelResMessage();
-                modelResMessage.setContent((String) message.get("content"));
-                modelResMessage.setReasoningContent((String) message.get("reasoning_content"));
-                return modelResMessage;
-            } catch (Exception e) {
-                LogUtils.error("sendChat error: " + e.toString());
-            }
-        } catch (Exception e) {
-            LogUtils.error("sendChat error2: " + e.toString());
-        }
-        return new ModelResMessage();
-    }
-
 
     public static void startLLaMAServer() {
         try {
 //            String command = "/Users/megan/Downloads/llama-b8149/llama-server --host localhost --port 8080 -m /Users/megan/Downloads/waterchat/resources/models/Qwen3-0.6B-GGUF/Qwen3-0.6B-Q8_0.gguf" +
 //                    " -ngl 0 --temp 0.6 --top-k 20 --top-p 0.95 --min-p 0.05 --presence-penalty 1.2 -c 16384 -n 4096 --jinja --no-context-shift";
-
             refreshCurrentModel();
 
             HashMap<String, String> allConfigKeyValue = SysConfigAction.getAllConfigKeyValue();
@@ -183,11 +120,12 @@ public class LLaMAServerCtrl {
         LLaMAServerCtrl.startLLaMAServer();
     }
 
+
     public static void shutdownLLaMAServer() {
         if (process != null) {
             process.destroy();
             try {
-                if (!process.waitFor(5, TimeUnit.SECONDS)) {
+                if (!process.waitFor(2, TimeUnit.SECONDS)) {
                     process.destroyForcibly();
                 }
             } catch (InterruptedException e) {
@@ -197,21 +135,31 @@ public class LLaMAServerCtrl {
         LogUtils.info("===== shutdownLLaMAServer successful.");
     }
 
+
     public static String callLLaMAServer() throws Exception {
         callLLaMAServerDetection();
+        if (!process.isAlive() || !AppHttpUtils.isLlamaServerHealth()){
+            String llamaServerRunningErrorNowMsg = "应用（server）运行出错。请退出应用，然后重新打开应用。敬请谅解！" +
+                    "\n\nThe application (server) encountered an error. " +
+                    "Please exit the application and then reopen it. " +
+                    "We apologize for the inconvenience!";
+            LogUtils.error("LLaMAServer 运行出错了。请退出应用，然后重新打开应用。");
+            return llamaServerRunningErrorNowMsg;
+        }
         List<Map<String, String>> messages = new ArrayList<>();
-        ModelResMessage modelResMessage = sendChat(HomepageAdaptor.assembleMsg(messages));
-        return assembleModelResMessage(modelResMessage);
+        MessageResDTO messageResDTO = AppHttpUtils.sendChat(HomepageAdaptor.assembleMsg(messages));
+        return assembleModelResMessage(messageResDTO);
     }
 
-    public static String assembleModelResMessage(ModelResMessage modelResMessage) {
+
+    public static String assembleModelResMessage(MessageResDTO messageResDTO) {
         String msg = "";
-        if (modelResMessage.getContent() != null && !modelResMessage.getContent().isEmpty()) {
-            msg = msg + modelResMessage.getContent();
+        if (messageResDTO.getContent() != null && !messageResDTO.getContent().isEmpty()) {
+            msg = msg + messageResDTO.getContent();
         }
-        if (modelResMessage.getReasoningContent() != null && !modelResMessage.getReasoningContent().isEmpty()) {
+        if (messageResDTO.getReasoningContent() != null && !messageResDTO.getReasoningContent().isEmpty()) {
             msg = msg + "\n\n\n\n\n********************************************************************\n" +
-                    "其中，AI思考过程：\n" + modelResMessage.getReasoningContent();
+                    "其中，AI思考过程：\n" + messageResDTO.getReasoningContent();
         }
         return msg;
     }
@@ -234,18 +182,6 @@ public class LLaMAServerCtrl {
 
     }
 
-
-    public static String getLLaMARealExecAbsPath() {
-        HashMap<String, String> allConfigKeyValue = SysConfigAction.getAllConfigKeyValue();
-        String llamaExecPath = LLaMAConf.getLLaMAExecAbsPath();
-        // 使用自定义的llama路径，用户自行设定 cuda llama.ccp的路径
-        if (!allConfigKeyValue.isEmpty() && !allConfigKeyValue.get("llama_custom_path").isEmpty()
-                && !allConfigKeyValue.get("llama_custom_path").equals("*")) {
-            llamaExecPath = allConfigKeyValue.get("llama_custom_path");
-        }
-
-        return llamaExecPath;
-    }
 
     private static String assembleLLaMAParams(HashMap<String, String> allConfigKeyValue) {
         String ngl = "0";

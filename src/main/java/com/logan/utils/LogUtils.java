@@ -1,9 +1,8 @@
 package com.logan.utils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.logan.chat.Message;
+import com.logan.chat.MessageDTO;
 import com.logan.config.SysConfig;
-import com.logan.config.SysConfigAction;
 
 import java.io.File;
 import java.io.IOException;
@@ -26,20 +25,20 @@ public class LogUtils {
 
     public static void info(String content) {
         LocalDateTime time = LocalDateTime.now();
-        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("HH:mm:ss");
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         String fmtTime = dtf.format(time);
-        System.out.println(fmtTime + " ==== [INFO] " + content);
+        System.out.println(fmtTime + " WaterChat [INFO] " + content);
     }
 
     public static void error(String content) {
         LocalDateTime time = LocalDateTime.now();
-        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("HH:mm:ss");
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         String fmtTime = dtf.format(time);
-        System.err.println(fmtTime + " ==== [ERROR] " + content);
+        System.err.println(fmtTime + " WaterChat [ERROR] " + content);
 
     }
 
-    public static String writeArrayListAsString(ArrayList<Message> list) {
+    public static String writeArrayListAsString(ArrayList<MessageDTO> list) {
         try {
             return mapper.writeValueAsString(list);
         } catch (Exception e) {
@@ -59,7 +58,7 @@ public class LogUtils {
             String stringBuilder = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").format(LocalDateTime.now()) +
                     " " + msg + "\n\n";
             LocalFileUtils.appendToMessageFile(stringBuilder,
-                    SysConfigAction.createAppLocalPath() + SysConfig.APP_LOG_FILE_NAME);
+                    SysConfig.LOG_CACHE_PATH + SysConfig.APP_LOG_FILE_NAME);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -69,9 +68,9 @@ public class LogUtils {
     /**
      * 如果文件超过 200MB，则删除前半部分数据，保留后半部分
      */
-    public static void trimLogFileIfTooLarge(){
+    public static void trimLogFileIfTooLarge() {
         try {
-            trimLogFileIfTooLarge(SysConfigAction.createAppLocalPath() + SysConfig.APP_LOG_FILE_NAME, 200L * 1024 * 1024);
+            trimLogFileIfTooLarge(SysConfig.LOG_CACHE_PATH + SysConfig.APP_LOG_FILE_NAME, 200L * 1024 * 1024);
             LogUtils.info("trimLogFileIfTooLarge successful.");
         } catch (IOException e) {
             e.printStackTrace();

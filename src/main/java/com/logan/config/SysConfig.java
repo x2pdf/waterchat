@@ -7,8 +7,8 @@ import java.util.HashMap;
 
 public class SysConfig {
     public static String APP_NAME = "WaterChat";
-    public static String MODEL_NAME = "Qwen3-0.6B-GGUF/Qwen3-0.6B-Q8_0.gguf";  // 需要指定到 xxxx.gguf 文件为止
-    public static String MODEL_PATH = "Qwen3-0.6B-GGUF/Qwen3-0.6B-Q8_0.gguf";  // 需要指定到 xxxx.gguf 文件为止
+    public static String MODEL_NAME = "Qwen3.5-0.8B-GGUF/Qwen3.5-0.8B-Q8_0.gguf";  // 需要指定到 xxxx.gguf 文件为止
+    public static String MODEL_PATH = "Qwen3.5-0.8B-GGUF/Qwen3.5-0.8B-Q8_0.gguf";  // 需要指定到 xxxx.gguf 文件为止
     public static ArrayList<String> MODEL_NAME_LIST = new ArrayList<>();
     public static String MODEL_DEFAULT_SYSTEM_PROMPT = "你是一个博览群书、上知天文下知地理、深刻理解人类世界各种经验的AI，" +
             "你不仅心思缜密，有崇高的道德感，还洋溢热情乐于助人，" +
@@ -47,8 +47,7 @@ public class SysConfig {
     public static String LANG = "cn";
     // 语言map，映射语言使用
     public static HashMap<String, String> LANG_MAP = new HashMap<>();
-    // 语言文件的缓存路径
-    public static String LANG_CACHE_PATH = TEMP_RESOURCES_PATH + "language" + File.separator;
+
 
     // AI对话日志的文件名称
     public static String SESSION_LOG_FILE_NAME = "chat_log_water_chat_session.txt";

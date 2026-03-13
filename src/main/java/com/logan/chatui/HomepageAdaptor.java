@@ -1,8 +1,8 @@
 package com.logan.chatui;
 
-import com.logan.chat.LLaMAServerCtrl;
-import com.logan.chat.Message;
-import com.logan.chat.RoleEnum;
+import com.logan.chat.MessageDTO;
+import com.logan.chat.llamaccp.LLaMAServerCtrl;
+import com.logan.chat.ChatRoleEnum;
 import com.logan.chat.SessionCtrl;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
@@ -69,44 +69,44 @@ public class HomepageAdaptor {
     }
 
     public static void addQuestion2MessagesList(String msg) {
-        Message message = new Message();
-        message.setRole(RoleEnum.user);
-        message.setContent(msg);
-        SessionCtrl.messages.add(message);
+        MessageDTO messageDTO = new MessageDTO();
+        messageDTO.setRole(ChatRoleEnum.user);
+        messageDTO.setContent(msg);
+        SessionCtrl.messageDTOS.add(messageDTO);
     }
 
     public static void addAnswer2MessagesList(String msg) {
-        Message message = new Message();
-        message.setRole(RoleEnum.assistant);
-        message.setContent(msg);
-        SessionCtrl.messages.add(message);
+        MessageDTO messageDTO = new MessageDTO();
+        messageDTO.setRole(ChatRoleEnum.assistant);
+        messageDTO.setContent(msg);
+        SessionCtrl.messageDTOS.add(messageDTO);
     }
 
     public static void addSystemFakeMsg() {
-        Message message = new Message();
-        message.setRole(RoleEnum.assistant);
-        message.setContent("****\n正在努力处理您的请求......\n等待中不可再输入文本哦～\n请耐心等待～～～～");
-        SessionCtrl.messages.add(message);
+        MessageDTO messageDTO = new MessageDTO();
+        messageDTO.setRole(ChatRoleEnum.assistant);
+        messageDTO.setContent("****\n正在努力处理您的请求......\n等待中不可再输入文本哦～\n请耐心等待～～～～");
+        SessionCtrl.messageDTOS.add(messageDTO);
     }
 
     public static void popupSystemFakeMsg() {
-        for (int i = SessionCtrl.messages.size() - 1; i > 0; i--) {
-            Message message = SessionCtrl.messages.get(i);
-            if (message.getContent().startsWith("****")) {
-                SessionCtrl.messages.remove(i);
+        for (int i = SessionCtrl.messageDTOS.size() - 1; i > 0; i--) {
+            MessageDTO messageDTO = SessionCtrl.messageDTOS.get(i);
+            if (messageDTO.getContent().startsWith("****")) {
+                SessionCtrl.messageDTOS.remove(i);
             }
         }
     }
 
     public static List<Map<String, String>> assembleMsg(List<Map<String, String>> messages) {
-        for (Message message : SessionCtrl.messages) {
-            String msg = message.getContent();
+        for (MessageDTO messageDTO : SessionCtrl.messageDTOS) {
+            String msg = messageDTO.getContent();
             if (HomepageAdaptor.ENABLE_THINKING){
                 msg += HomepageAdaptor.THINKING_TEXT;
             }else {
                 msg += HomepageAdaptor.NO_THINKING_TEXT;
             }
-            messages.add(msg(message.getRole().toString(), msg));
+            messages.add(msg(messageDTO.getRole().toString(), msg));
         }
         return messages;
     }

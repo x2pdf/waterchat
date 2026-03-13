@@ -1,6 +1,6 @@
 package com.logan.chat;
 
-public class ModelResMessage {
+public class MessageResDTO {
     private String content;
     private String reasoningContent;
 

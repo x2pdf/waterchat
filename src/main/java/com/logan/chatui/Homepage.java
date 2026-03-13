@@ -1,14 +1,12 @@
 package com.logan.chatui;
 
-import com.logan.chat.LLaMAConf;
-import com.logan.chat.Message;
-import com.logan.chat.RoleEnum;
+import com.logan.chat.MessageDTO;
+import com.logan.chat.llamaccp.LLaMAConf;
+import com.logan.chat.ChatRoleEnum;
 import com.logan.chat.SessionCtrl;
 import com.logan.config.SysConfig;
 import com.logan.config.SysConfigAction;
 import com.logan.utils.LogUtils;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -102,23 +100,23 @@ public class Homepage {
             if (isNeedSystemPrompt.isSelected()) {
                 HomepageAdaptor.IS_NEED_SYSTEM_PROMPT = true;
                 boolean isHasSystemPrompt = false;
-                for (Message message : SessionCtrl.messages) {
-                    if (message.getRole().equals(RoleEnum.system)) {
+                for (MessageDTO messageDTO : SessionCtrl.messageDTOS) {
+                    if (messageDTO.getRole().equals(ChatRoleEnum.system)) {
                         isHasSystemPrompt = true;
                     }
                 }
                 if (!isHasSystemPrompt) {
-                    Message message = new Message();
-                    message.setRole(RoleEnum.system);
-                    message.setContent(SysConfig.MODEL_DEFAULT_SYSTEM_PROMPT);
-                    SessionCtrl.messages.add(0, message);
+                    MessageDTO messageDTO = new MessageDTO();
+                    messageDTO.setRole(ChatRoleEnum.system);
+                    messageDTO.setContent(SysConfig.MODEL_DEFAULT_SYSTEM_PROMPT);
+                    SessionCtrl.messageDTOS.add(0, messageDTO);
                 }
                 LogUtils.info("isNeedSystemPrompt 功能已启用");
             } else {
                 HomepageAdaptor.IS_NEED_SYSTEM_PROMPT = false;
-                Message message = SessionCtrl.messages.get(0);
-                if (message.getRole().equals(RoleEnum.system)) {
-                    SessionCtrl.messages.remove(0);
+                MessageDTO messageDTO = SessionCtrl.messageDTOS.get(0);
+                if (messageDTO.getRole().equals(ChatRoleEnum.system)) {
+                    SessionCtrl.messageDTOS.remove(0);
                 }
                 LogUtils.info("isNeedSystemPrompt 功能已关闭");
             }
@@ -168,17 +166,17 @@ public class Homepage {
 
         // 先清除已有消息
         vbox.getChildren().clear();
-        int msgSize = SessionCtrl.messages.size();
+        int msgSize = SessionCtrl.messageDTOS.size();
         for (int i = 0; i < msgSize; i++) {
             // 獲取新的所有消息
-            Message message = SessionCtrl.messages.get(i);
+            MessageDTO messageDTO = SessionCtrl.messageDTOS.get(i);
             // 移除系统提示语
-            if (!HomepageAdaptor.IS_NEED_SYSTEM_PROMPT && message.getRole().equals(RoleEnum.system)) {
+            if (!HomepageAdaptor.IS_NEED_SYSTEM_PROMPT && messageDTO.getRole().equals(ChatRoleEnum.system)) {
                 continue;
             }
-            TextArea messageBox = createMessageBox(message.getContent());
+            TextArea messageBox = createMessageBox(messageDTO.getContent());
             // 重建對話box
-            styleTextArea(messageBox, message.getRole());
+            styleTextArea(messageBox, messageDTO.getRole());
             fontSizeTextArea(messageBox, SysConfig.FONT_SIZE);
             vbox.getChildren().add(messageBox);
         }
@@ -247,8 +245,8 @@ public class Homepage {
         isTextAreaInputFreeze = false;
     }
 
-    private static void styleTextArea(TextArea textArea, RoleEnum roleEnum) {
-        if (RoleEnum.user.equals(roleEnum)) {
+    private static void styleTextArea(TextArea textArea, ChatRoleEnum chatRoleEnum) {
+        if (ChatRoleEnum.user.equals(chatRoleEnum)) {
             textArea.setStyle(
                     "-fx-background-color: #f0f0f0; " +
                             "-fx-control-inner-background: #DCDCDC;" +

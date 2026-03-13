@@ -2,17 +2,17 @@ package com.logan.chat;
 
 
 
-public class Message {
+public class MessageDTO {
 
-    private RoleEnum role;
+    private ChatRoleEnum role;
     private String content;
 
 
-    public RoleEnum getRole() {
+    public ChatRoleEnum getRole() {
         return role;
     }
 
-    public void setRole(RoleEnum role) {
+    public void setRole(ChatRoleEnum role) {
         this.role = role;
     }
 

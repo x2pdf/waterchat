@@ -1,6 +1,8 @@
 package com.logan.chatui;
 
-import com.logan.chat.LLaMAServerCtrl;
+import com.logan.chat.llamaccp.LLaMAServerCtrl;
+import com.logan.chat.refresh.RefreshConfig;
+import com.logan.chat.refresh.RefreshUI;
 import com.logan.config.SysConfig;
 import com.logan.config.SysConfigAction;
 import com.logan.utils.AlertUtils;
@@ -81,7 +83,7 @@ public class HelpPage {
         productIntroductionButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                String appSavePath = SysConfigAction.createAppLocalPath();
+                String appSavePath = SysConfig.APP_DOWNLOAD_PATH;
                 AlertUtils.saveProductIntroduction(appSavePath);
                 AlertUtils.openExplorer(appSavePath);
             }
@@ -164,20 +166,16 @@ public class HelpPage {
         modelsChoiceBox.setOnAction((event) -> {
             int selectedIndex = modelsChoiceBox.getSelectionModel().getSelectedIndex();
             try {
-                if (selectedIndex == 0) {
-                    SysConfigAction.updateModelName(SysConfig.MODEL_NAME_LIST.get(0));
-                    LogUtils.info("选择模型：" + SysConfig.MODEL_NAME_LIST.get(0));
-                } else if (selectedIndex == 1) {
-                    SysConfigAction.updateModelName(SysConfig.MODEL_NAME_LIST.get(1));
-                    LogUtils.info("选择模型：" + SysConfig.MODEL_NAME_LIST.get(1));
-                } else if (selectedIndex == 2) {
-                    SysConfigAction.updateModelName(SysConfig.MODEL_NAME_LIST.get(2));
-                    LogUtils.info("选择模型：" + SysConfig.MODEL_NAME_LIST.get(2));
-                } else {
-                    SysConfigAction.updateModelName(SysConfig.MODEL_NAME_LIST.get(0));
-                    LogUtils.info("选择模型：" + SysConfig.MODEL_NAME_LIST.get(0));
+                for (int i = 0; i < nameChoices.size(); i++) {
+                    if (i != selectedIndex){
+                        continue;
+                    }else {
+                        SysConfig.MODEL_NAME = SysConfig.MODEL_NAME_LIST.get(selectedIndex);
+                        RefreshUI.updateAppName();
+                        LogUtils.info("选择模型：" + SysConfig.MODEL_NAME_LIST.get(selectedIndex));
+                    }
                 }
-                SysConfigAction.refreshConfig();
+                RefreshConfig.refreshConfig();
                 LLaMAServerCtrl.refreshModelMmprojInfo();
                 LLaMAServerCtrl.restartLLaMAServer();
             } catch (IOException e) {
