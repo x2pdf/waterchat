@@ -1,11 +1,9 @@
 package com.logan.chatui;
 
-import com.logan.chat.MessageDTO;
-import com.logan.chat.llamaccp.LLaMAConf;
 import com.logan.chat.ChatRoleEnum;
+import com.logan.chat.MessageDTO;
 import com.logan.chat.SessionCtrl;
 import com.logan.config.SysConfig;
-import com.logan.config.SysConfigAction;
 import com.logan.utils.LogUtils;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -13,22 +11,13 @@ import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextArea;
-import javafx.scene.input.Clipboard;
 import javafx.scene.layout.*;
-
-import java.awt.*;
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class Homepage {
     public static TextArea textAreaInput = new TextArea();
     public static VBox vbox = new VBox();
     public static ScrollPane scrollPane = new ScrollPane(vbox);
     public static boolean isTextAreaInputFreeze = false;
-
 
     public static AnchorPane getHomeTab() {
         AnchorPane homepageAnchorPane = new AnchorPane();
@@ -41,105 +30,18 @@ public class Homepage {
         stackPane.setAlignment(Pos.BOTTOM_CENTER);
         stackPane.getChildren().add(textAreaInput);
 
-        Button buttonSend = new Button(SysConfigAction.getLang("send"));
-        buttonSend.setPrefWidth(200);
-        buttonSend.setStyle("-fx-background-color: #3A5FCD;");
+        Button sendButton = HomepageButtons.getSendButton();
+        Button newChatButton = HomepageButtons.getNewChatButton();
+        Button openDeviceBrowserButton = HomepageButtons.getOpenDeviceBrowserButton();
 
-        buttonSend.setOnAction(event -> {
-            if (isTextAreaInputFreeze) {
-                return;
-            }
-            String msg = textAreaInput.getText();
-            if (msg == null || msg.isEmpty()) {
-                // 输入框为空 → 尝试从剪贴板获取文本
-                Clipboard clipboard = Clipboard.getSystemClipboard();
-                if (clipboard.hasString()) {           // 优先检查有没有字符串
-                    String copyText = clipboard.getString();
-                    // 可选：再检查是否为空或只有空白
-                    if (copyText != null && !copyText.trim().isEmpty()) {
-                        // 这里就是你想要的 copyText
-                        msg = copyText;
-                    }
-                }
-            }
-            LogUtils.info("======== input msg: " + textAreaInput.getText());
-            if (msg != null && !msg.isEmpty()) {
-                // 消息加入到本地缓存list
-                HomepageAdaptor.addQuestion2MessagesList(msg);
-                HomepageAdaptor.newThreadAddMessage2Session(msg);
-                // 刷新ui，冻结ui不再允许输入
-                freezeInputTextArea();
-                freshChatMsgBox();
-            }
-        });
-
-        Button buttonNewChat = new Button(SysConfigAction.getLang("newChat"));
-        buttonNewChat.setOnAction(event -> {
-            LogUtils.info("buttonNewChat ");
-            if (isTextAreaInputFreeze) {
-                return;
-            }
-            SessionCtrl.createSession();
-        });
-
-
-        Button buttonOpenDeviceBrowser = new Button(SysConfigAction.getLang("chatInExplorer"));
-        buttonOpenDeviceBrowser.setOnAction(event -> {
-            LogUtils.info("buttonOpenDeviceBrowser ");
-            try {
-                // 需要增加 “http://”
-                Desktop.getDesktop().browse(new URI("http://" + LLaMAConf.LLAMA_SERVER_HOST + ":" + LLaMAConf.LLAMA_SERVER_PORT));
-            } catch (IOException | URISyntaxException e) {
-                throw new RuntimeException(e);
-            }
-        });
-
-        CheckBox isNeedSystemPrompt = new CheckBox(SysConfigAction.getLang("isNeedSystemPrompt"));
-        isNeedSystemPrompt.setSelected(true);   // 这句让它默认勾选
-        isNeedSystemPrompt.setOnAction(e -> {
-            if (isNeedSystemPrompt.isSelected()) {
-                HomepageAdaptor.IS_NEED_SYSTEM_PROMPT = true;
-                boolean isHasSystemPrompt = false;
-                for (MessageDTO messageDTO : SessionCtrl.messageDTOS) {
-                    if (messageDTO.getRole().equals(ChatRoleEnum.system)) {
-                        isHasSystemPrompt = true;
-                    }
-                }
-                if (!isHasSystemPrompt) {
-                    MessageDTO messageDTO = new MessageDTO();
-                    messageDTO.setRole(ChatRoleEnum.system);
-                    messageDTO.setContent(SysConfig.MODEL_DEFAULT_SYSTEM_PROMPT);
-                    SessionCtrl.messageDTOS.add(0, messageDTO);
-                }
-                LogUtils.info("isNeedSystemPrompt 功能已启用");
-            } else {
-                HomepageAdaptor.IS_NEED_SYSTEM_PROMPT = false;
-                MessageDTO messageDTO = SessionCtrl.messageDTOS.get(0);
-                if (messageDTO.getRole().equals(ChatRoleEnum.system)) {
-                    SessionCtrl.messageDTOS.remove(0);
-                }
-                LogUtils.info("isNeedSystemPrompt 功能已关闭");
-            }
-
-            HomepageAdaptor.freshChatMsgBox();
-        });
-
-        CheckBox enableThinking = new CheckBox(SysConfigAction.getLang("thinkingMode"));
-        enableThinking.setOnAction(e -> {
-            if (enableThinking.isSelected()) {
-                HomepageAdaptor.ENABLE_THINKING = true;
-                LogUtils.info("Thinking 功能已启用");
-            } else {
-                HomepageAdaptor.ENABLE_THINKING = false;
-                LogUtils.info("Thinking 功能已关闭");
-            }
-        });
+        CheckBox isNeedSystemPrompt = HomepageCheckBox.getIsNeedSystemPrompt();
+        CheckBox enableThinking = HomepageCheckBox.getEnableThinking();
 
         // 创建占位 Region 来把右边按钮推到右边
         Region spacer = new Region();
         HBox.setHgrow(spacer, javafx.scene.layout.Priority.ALWAYS);
 
-        HBox buttonBox = new HBox(buttonOpenDeviceBrowser, spacer, isNeedSystemPrompt, enableThinking, buttonNewChat, buttonSend);
+        HBox buttonBox = new HBox(openDeviceBrowserButton, spacer, isNeedSystemPrompt, enableThinking, newChatButton, sendButton);
         buttonBox.setSpacing(5);
         buttonBox.setAlignment(Pos.BASELINE_CENTER);
 
@@ -176,8 +78,8 @@ public class Homepage {
             }
             TextArea messageBox = createMessageBox(messageDTO.getContent());
             // 重建對話box
-            styleTextArea(messageBox, messageDTO.getRole());
-            fontSizeTextArea(messageBox, SysConfig.FONT_SIZE);
+            HomepageStyle.styleTextArea(messageBox, messageDTO.getRole());
+            HomepageStyle.fontSizeTextArea(messageBox, SysConfig.FONT_SIZE);
             vbox.getChildren().add(messageBox);
         }
 
@@ -208,7 +110,7 @@ public class Homepage {
         // 设置文本不可编辑
         textArea.setEditable(false);
         // 设置文本行数
-        textArea.setPrefRowCount(setTextAreaPrefRow(msgText));
+        textArea.setPrefRowCount(HomepageStyle.setTextAreaPrefRow(msgText));
         return textArea;
     }
 
@@ -220,7 +122,7 @@ public class Homepage {
         textAreaInput.setWrapText(true);
         textAreaInput.textProperty().addListener((observable, oldValue, newValue) -> {
             // 在这里处理文本变化事件
-            textAreaInput.setPrefRowCount(setTextAreaPrefRow(newValue));
+            textAreaInput.setPrefRowCount(HomepageStyle.setTextAreaPrefRow(newValue));
         });
     }
 
@@ -243,78 +145,6 @@ public class Homepage {
         textAreaInput.clear();     // clear輸入框内容
         textAreaInputEnableEditable();
         isTextAreaInputFreeze = false;
-    }
-
-    private static void styleTextArea(TextArea textArea, ChatRoleEnum chatRoleEnum) {
-        if (ChatRoleEnum.user.equals(chatRoleEnum)) {
-            textArea.setStyle(
-                    "-fx-background-color: #f0f0f0; " +
-                            "-fx-control-inner-background: #DCDCDC;" +
-                            "-fx-background-insets: 0; " +
-                            "-fx-background-radius: 0; " +
-                            "-fx-padding: 2; " +
-                            "-fx-border-color: #d3d3d3;"
-            );
-        } else {
-            textArea.setStyle(
-                    "-fx-background-color: #f0f0f0; " +
-                            "-fx-background-insets: 0; " +
-                            "-fx-background-radius: 0; " +
-                            "-fx-padding: 2; " +
-                            "-fx-border-color: #d3d3d3;"
-            );
-        }
-    }
-
-
-    private static void fontSizeTextArea(TextArea textArea, int fontSize) {
-        String currentStyle = textArea.getStyle();
-        if (fontSize > 0) {
-            textArea.setStyle(currentStyle + " -fx-font-size: " + String.valueOf(fontSize) + "px;");
-        } else {
-            textArea.setStyle(currentStyle + " -fx-font-size: 16px;");
-        }
-    }
-
-    public static int setTextAreaPrefRow(String msgText) {
-        int row = 2;
-        int lines = countLines(msgText);
-        if (lines < 6) {
-            row = row + 2;
-        } else if (lines < 10) {
-            row = row + 6;
-        } else if (lines < 50) {
-            row = row + 20;
-        } else if (lines < 200) {
-            row = row + 50;
-        } else if (lines < 400) {
-            row = row + 80;
-        } else if (lines < 800) {
-            row = row + 120;
-        } else if (lines < 1200) {
-            row = row + 200;
-        } else {
-            row = row + 300;
-        }
-
-        int wordsPrefRows = countWordsPrefRows(msgText);
-        row = Math.max(wordsPrefRows, row);
-        return row;
-    }
-
-    public static int countLines(String str) {
-        Pattern pattern = Pattern.compile("\\r\\n|\\r|\\n");
-        Matcher matcher = pattern.matcher(str);
-        int count = 1; // 初始为1，因为第一行没有换行符
-        while (matcher.find()) {
-            count++;
-        }
-        return count;
-    }
-
-    public static int countWordsPrefRows(String str) {
-        // 800像素宽度时，假设 40 字为一行
-        return str.length() / 40;
     }
 
 }
