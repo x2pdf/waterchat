@@ -3,6 +3,7 @@ package com.logan.chat.refresh;
 import com.logan.chat.init.ConfigFileAppInit;
 import com.logan.config.InitSourceTemplate;
 import com.logan.config.SysConfig;
+import com.logan.config.SysConfigAction;
 import com.logan.utils.LogUtils;
 
 import java.io.IOException;
@@ -15,6 +16,12 @@ public class RefreshConfig {
         ConfigFileAppInit.initLang();
         RefreshUI.updateAppName();
         LogUtils.info("refreshConfig() 配置已更新！");
+    }
+
+
+    public static void uiChangeAIModel() {
+        SysConfigAction.updateConfigModelName(SysConfig.MODEL_NAME);
+        SysConfigAction.updateConfigModelPath(SysConfig.MODEL_NAME);
     }
 
 }

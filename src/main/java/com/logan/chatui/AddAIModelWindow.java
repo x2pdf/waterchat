@@ -3,6 +3,7 @@ package com.logan.chatui;
 
 import com.logan.chat.AIModelNameDTO;
 import com.logan.chat.refresh.RefreshConfig;
+import com.logan.chat.refresh.RefreshUI;
 import com.logan.chat.widgets.AIModelMainFilePathHBox;
 import com.logan.config.SysConfig;
 import com.logan.config.SysConfigAction;

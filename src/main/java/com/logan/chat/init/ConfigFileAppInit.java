@@ -1,5 +1,6 @@
 package com.logan.chat.init;
 
+import com.logan.App;
 import com.logan.chat.llamaccp.LLaMAConf;
 import com.logan.chatui.HelpPage;
 import com.logan.config.InitSourceTemplate;

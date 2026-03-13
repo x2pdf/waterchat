@@ -81,13 +81,13 @@ public class SysConfigAction {
 
         String newModelNameList = "";
         String modelNameList = SysConfig.configHashMap.get("model_name_list");
-        if (!modelNameList.isEmpty()){
+        if (!modelNameList.isEmpty()) {
             // 如果已经有同名的情形
-            if (modelNameList.contains(newModelName)){
+            if (modelNameList.contains(newModelName)) {
                 return;
             }
             newModelNameList = modelNameList + "," + newModelName;
-        }else {
+        } else {
             LogUtils.error("model_name_list append error.");
             newModelNameList = newModelName;
         }
@@ -96,7 +96,7 @@ public class SysConfigAction {
 
 
     public static void addConfigModelNameMMProj(String modelName, String nameMmproj) {
-        if (nameMmproj != null && !nameMmproj.isEmpty()){
+        if (nameMmproj != null && !nameMmproj.isEmpty()) {
             String resourcesDirectoryPath = SysConfig.TEMP_RESOURCES_PATH;
             String filePath = resourcesDirectoryPath + SysConfig.CONFIG_PATH;
 
@@ -112,32 +112,54 @@ public class SysConfigAction {
                 String appendLine = modelName + ":mmproj=" + nameMmproj;
                 appendConfigLine(filePath, appendLine);
             } catch (IOException e) {
-                LogUtils.error("addConfigModelNameMMProj error: "+ e);
+                LogUtils.error("addConfigModelNameMMProj error: " + e);
             }
         }
 
     }
 
     public static void updateConfigFontSize(int fontSize) {
-        String resourcesDirectoryPath = SysConfig.TEMP_RESOURCES_PATH;
-        String filePath = resourcesDirectoryPath + SysConfig.CONFIG_PATH;
         SysConfig.FONT_SIZE = fontSize;
-        SysConfigAction.updateConfigValue(filePath, "font_size", String.valueOf(fontSize));
+        SysConfigAction.updateConfigValue(getDefaultConfigPath(), "font_size", String.valueOf(fontSize));
     }
 
     public static void updateConfigAICreativity(double aiCreativity) {
-        String resourcesDirectoryPath = SysConfig.TEMP_RESOURCES_PATH;
-        String filePath = resourcesDirectoryPath + SysConfig.CONFIG_PATH;
         SysConfig.AI_CREATIVITY = aiCreativity;
-        SysConfigAction.updateConfigValue(filePath, "--temp", String.valueOf(aiCreativity));
+        SysConfigAction.updateConfigValue(getDefaultConfigPath(), "--temp", String.valueOf(aiCreativity));
     }
 
     public static void updateConfigLanguage(String lang) {
-        String resourcesDirectoryPath = SysConfig.TEMP_RESOURCES_PATH;
-        String filePath = resourcesDirectoryPath + SysConfig.CONFIG_PATH;
         SysConfig.LANG = lang;
-        SysConfigAction.updateConfigValue(filePath, "lang", lang);
+        SysConfigAction.updateConfigValue(getDefaultConfigPath(), "lang", lang);
     }
+
+    public static void updateConfigModelName(String modelName) {
+        SysConfig.MODEL_NAME = modelName;
+        SysConfigAction.updateConfigValue(getDefaultConfigPath(), "model_name", modelName);
+    }
+
+    public static void updateConfigModelPath(String modelName) {
+        if (modelName == null || modelName.isEmpty()) {
+            return;
+        }
+        // modelName ====> Qwen3.5-0.8B-GGUF/Qwen3.5-0.8B-Q8_0.gguf
+        String[] split = modelName.split(File.separator);
+        String modelPath = "";
+        if (split.length > 0) {
+            String modelNamePrefix= split[0];
+            modelPath =  "models/" + modelNamePrefix;
+        }else{
+            return;
+        }
+        SysConfig.MODEL_PATH = modelPath;
+        SysConfigAction.updateConfigValue(getDefaultConfigPath(), "model_path", modelPath);
+    }
+
+    public static String getDefaultConfigPath() {
+        String resourcesDirectoryPath = SysConfig.TEMP_RESOURCES_PATH;
+        return resourcesDirectoryPath + SysConfig.CONFIG_PATH;
+    }
+
 
     public static void updateConfigValue(String filePath, String key, String newValue) {
         Path path = Paths.get(filePath);

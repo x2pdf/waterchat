@@ -42,6 +42,7 @@ public class HelpPageCheckBox {
                         LogUtils.info("选择模型：" + SysConfig.MODEL_NAME_LIST.get(selectedIndex));
                     }
                 }
+                RefreshConfig.uiChangeAIModel();
                 RefreshConfig.refreshConfig();
                 LLaMAServerCtrl.refreshModelMmprojInfo();
                 LLaMAServerCtrl.restartLLaMAServer();
