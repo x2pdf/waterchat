@@ -125,7 +125,7 @@ public class LLaMAServerCtrl {
         if (process != null) {
             process.destroy();
             try {
-                if (!process.waitFor(2, TimeUnit.SECONDS)) {
+                if (!process.waitFor(8, TimeUnit.SECONDS)) {
                     process.destroyForcibly();
                 }
             } catch (InterruptedException e) {
