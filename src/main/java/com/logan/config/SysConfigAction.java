@@ -143,7 +143,10 @@ public class SysConfigAction {
             return;
         }
         // modelName ====> Qwen3.5-0.8B-GGUF/Qwen3.5-0.8B-Q8_0.gguf
-        String[] split = modelName.split(File.separator);
+        String[] split = modelName.split("/");
+        if(split.length == 0){
+            split = modelName.split("\\\\");
+        }
         String modelPath = "";
         if (split.length > 0) {
             String modelNamePrefix= split[0];
