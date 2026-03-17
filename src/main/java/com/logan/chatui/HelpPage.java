@@ -92,17 +92,18 @@ public class HelpPage {
 
         Text adv = new Text(SysConfigAction.getLang("productSlogan"));
         Text version = new Text("WaterChat version 26.");
+        Text author = new Text("Author: Logan Cham.");
         Text allRight = new Text("All Rights Reserved.");
         VBox vBox;
         if (SysConfig.IS_MACOS) {
             vBox = new VBox(modelsChoiceBox, addAIModelButton, logChoiceBox, langChoiceBox, fontSizeChoiceBox,
                     aiCreativityChoiceBox, sessionLogButton,
-                    tipsButton, productIntroductionButton, adv, version, allRight);
+                    tipsButton, productIntroductionButton, adv, version, author, allRight);
         } else {
             ChoiceBox vulkanChoiceBox = HelpPageCheckBox.getVulkanChoiceBox();
             vBox = new VBox(modelsChoiceBox, addAIModelButton, logChoiceBox, langChoiceBox, fontSizeChoiceBox,
                     aiCreativityChoiceBox, vulkanChoiceBox, sessionLogButton,
-                    tipsButton, productIntroductionButton, adv, version, allRight);
+                    tipsButton, productIntroductionButton, adv, version, author, allRight);
         }
 
         vBox.setAlignment(Pos.CENTER);
