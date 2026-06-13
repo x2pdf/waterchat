@@ -19,7 +19,7 @@ public class HomepageButtons {
     public static Button getSendButton(){
         Button buttonSend = new Button(SysConfigAction.getLang("send"));
         buttonSend.setPrefWidth(200);
-        buttonSend.setStyle("-fx-background-color: #3A5FCD;");
+        buttonSend.setStyle("-fx-background-color: #008B8B; -fx-text-fill: white; -fx-font-weight: bold;");
 
         buttonSend.setOnAction(event -> {
             if (Homepage.isTextAreaInputFreeze) {
