@@ -45,19 +45,4 @@ public class HomepageCheckBox {
         return isNeedSystemPrompt;
     }
 
-
-    public static CheckBox getEnableThinking() {
-        CheckBox enableThinking = new CheckBox(SysConfigAction.getLang("thinkingMode"));
-        enableThinking.setOnAction(e -> {
-            if (enableThinking.isSelected()) {
-                HomepageAdaptor.ENABLE_THINKING = true;
-                LogUtils.info("Thinking 功能已启用");
-            } else {
-                HomepageAdaptor.ENABLE_THINKING = false;
-                LogUtils.info("Thinking 功能已关闭");
-            }
-        });
-        return enableThinking;
-    }
-
 }

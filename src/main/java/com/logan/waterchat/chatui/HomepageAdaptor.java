@@ -17,9 +17,6 @@ import java.util.Map;
 
 public class HomepageAdaptor {
 
-    public static boolean ENABLE_THINKING = false;
-    public static String THINKING_TEXT = " /think";
-    public static String NO_THINKING_TEXT = " /no_think";
     public static Boolean IS_NEED_SYSTEM_PROMPT = true;
     // 在类里加一个静态字段
     private static Service<String> service;
@@ -42,7 +39,6 @@ public class HomepageAdaptor {
                     protected String call() throws Exception {
                         try {
                             String result = LLaMAServerCtrl.callLLaMAServer();
-                            LogUtils.info("======== AI answer1: " + result);
                             return result;
                         } catch (Exception e) {
                             LogUtils.error("Task 执行异常" + e);
@@ -57,13 +53,9 @@ public class HomepageAdaptor {
         service.setOnSucceeded(event -> {
             try {
                 String result = service.getValue();
-                LogUtils.info("======== AI answer2: " + result);
-
                 HomepageAdaptor.addAnswer2MessagesList(result);
                 HomepageAdaptor.freshChatMsgBox();
                 Homepage.unfreezeInputTextArea();
-
-                LogUtils.info("======== AI answer2 处理完成");
             } catch (Exception e) {
                 LogUtils.error("setOnSucceeded 中发生异常" + e);
                 e.printStackTrace();
@@ -124,11 +116,6 @@ public class HomepageAdaptor {
     public static List<Map<String, String>> assembleMsg(List<Map<String, String>> messages) {
         for (MessageDTO messageDTO : SessionCtrl.messageDTOS) {
             String msg = messageDTO.getContent();
-//            if (HomepageAdaptor.ENABLE_THINKING){
-//                msg += HomepageAdaptor.THINKING_TEXT;
-//            }else {
-//                msg += HomepageAdaptor.NO_THINKING_TEXT;
-//            }
             messages.add(msg(messageDTO.getRole().toString(), msg));
         }
         return messages;

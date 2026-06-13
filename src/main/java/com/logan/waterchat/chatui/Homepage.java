@@ -36,13 +36,13 @@ public class Homepage {
         Button openDeviceBrowserButton = HomepageButtons.getOpenDeviceBrowserButton();
 
         CheckBox isNeedSystemPrompt = HomepageCheckBox.getIsNeedSystemPrompt();
-        CheckBox enableThinking = HomepageCheckBox.getEnableThinking();
+
 
         // 创建占位 Region 来把右边按钮推到右边
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
 
-        HBox buttonBox = new HBox(openDeviceBrowserButton, spacer, isNeedSystemPrompt, enableThinking, newChatButton, sendButton);
+        HBox buttonBox = new HBox(openDeviceBrowserButton, spacer, isNeedSystemPrompt, newChatButton, sendButton);
         buttonBox.setSpacing(5);
         buttonBox.setAlignment(Pos.BASELINE_CENTER);
 
