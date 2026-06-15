@@ -3,6 +3,7 @@ package com.logan.waterchat;
 import com.logan.waterchat.chat.llamaccp.LLaMAServerCtrl;
 import com.logan.waterchat.chat.refresh.RefreshConfig;
 import com.logan.waterchat.chatui.UIInit;
+import com.logan.waterchat.config.Heartbeat;
 import com.logan.waterchat.config.InitSourceTemplate;
 import com.logan.waterchat.utils.LogUtils;
 import javafx.application.Application;
@@ -29,11 +30,13 @@ public class WaterChatApplication extends Application {
 
             UIInit.initStage(stage);
             primaryStage = stage;
+            Heartbeat.start();
             stage.setOnCloseRequest(new EventHandler<WindowEvent>() {
                 @Override
                 public void handle(WindowEvent event) {
                     LLaMAServerCtrl.shutdownLLaMAServer();
                     LogUtils.trimLogFileIfTooLarge();
+                    Heartbeat.stop();
                     System.gc();
                 }
             });
