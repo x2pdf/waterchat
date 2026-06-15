@@ -26,8 +26,6 @@ public class LLaMAServerCtrl {
 
     public static void startLLaMAServer() {
         try {
-//            String command = "/Users/megan/Downloads/llama-b8149/llama-server --host localhost --port 8080 -m /Users/megan/Downloads/waterchat/resources/models/Qwen3-0.6B-GGUF/Qwen3-0.6B-Q8_0.gguf" +
-//                    " -ngl 0 --temp 0.6 --top-k 20 --top-p 0.95 --min-p 0.05 --presence-penalty 1.2 -c 16384 -n 4096 --jinja --no-context-shift";
             refreshCurrentModel();
 
             HashMap<String, String> allConfigKeyValue = SysConfigAction.getAllConfigKeyValue();
