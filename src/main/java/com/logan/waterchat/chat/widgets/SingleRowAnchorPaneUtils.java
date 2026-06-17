@@ -196,21 +196,6 @@ public class SingleRowAnchorPaneUtils {
     }
 
 
-    public static ChoiceBox getChoiceBox(AnchorPane anchorPane) {
-        if (anchorPane == null) {
-            return null;
-        }
-        ObservableList<Node> children = anchorPane.getChildren();
-        for (Node child : children) {
-            if (child instanceof ChoiceBox) {
-                ChoiceBox choiceBox = (ChoiceBox) child;
-                return choiceBox;
-            }
-        }
-
-        return null;
-    }
-
     /**
      * 入参的 pane 只可以是 本工具类返回的 pane 对象，其他自定义 pane 不该调用被方法
      */
@@ -229,51 +214,6 @@ public class SingleRowAnchorPaneUtils {
         return null;
     }
 
-    /**
-     * 入参的 pane 只可以是 本工具类返回的 pane 对象，其他自定义 pane 不该调用被方法
-     */
-    public static HBox getTextHBox(AnchorPane anchorPane) {
-        if (anchorPane == null) {
-            return null;
-        }
-        ObservableList<Node> children = anchorPane.getChildren();
-        for (Node child : children) {
-            if (child instanceof HBox) {
-                HBox hBox = (HBox) child;
-                for (Node hBoxChild : hBox.getChildren()) {
-                    if (hBoxChild instanceof HBox) {
-                        HBox text = (HBox) hBoxChild;
-                        return text;
-                    }
-                }
-            }
-        }
-
-        return null;
-    }
-
-    /**
-     * 入参的 pane 只可以是 本工具类返回的 pane 对象，其他自定义 pane 不该调用被方法
-     */
-    public static TextField getTextField(AnchorPane anchorPane) {
-        if (anchorPane == null) {
-            return null;
-        }
-        ObservableList<Node> children = anchorPane.getChildren();
-        for (Node child : children) {
-            if (child instanceof HBox) {
-                HBox hBox = (HBox) child;
-                for (Node hBoxChild : hBox.getChildren()) {
-                    if (hBoxChild instanceof TextField) {
-                        TextField textField = (TextField) hBoxChild;
-                        return textField;
-                    }
-                }
-            }
-        }
-
-        return null;
-    }
 
     public static TextArea getTextArea(AnchorPane anchorPane) {
         if (anchorPane == null) {
@@ -317,24 +257,5 @@ public class SingleRowAnchorPaneUtils {
         }
     }
 
-    /**
-     * 入参的 pane 只可以是 本工具类返回的 pane 对象，其他自定义 pane 不该调用被方法
-     */
-    public static void getText2AndUpdate(AnchorPane anchorPane, String newTextValue) {
-        if (anchorPane == null) {
-            return;
-        }
-        ObservableList<Node> children = anchorPane.getChildren();
-        for (Node child : children) {
-            if (child instanceof HBox) {
-                HBox hBox = (HBox) child;
-                Node node = hBox.getChildren().get(1);
-                if (node instanceof Text) {
-                    Text text = (Text) node;
-                    text.setText(" " + newTextValue);
-                }
-            }
-        }
-    }
 
 }

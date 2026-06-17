@@ -24,6 +24,7 @@ public class LLaMAConf {
 
     public static boolean IS_MODEL_CONTAIN_MMPORJ_FILE = false;
     public static String MODEL_MMPORJ_FILENAME = "";
+    public static double AI_CREATIVITY = 0.3;
 
     public static String getLLaMAExecPath() {
         String os = System.getProperty("os.name").toLowerCase();

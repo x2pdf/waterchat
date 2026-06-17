@@ -4,6 +4,7 @@ package com.logan.waterchat.chatui;
 import com.logan.waterchat.chat.ChatRoleEnum;
 import com.logan.waterchat.chat.MessageDTO;
 import com.logan.waterchat.chat.SessionCtrl;
+import com.logan.waterchat.config.AppUIConfig;
 import com.logan.waterchat.config.SysConfig;
 import com.logan.waterchat.utils.LogUtils;
 import javafx.geometry.Insets;
@@ -22,7 +23,7 @@ public class Homepage {
 
     public static AnchorPane getHomeTab() {
         AnchorPane homepageAnchorPane = new AnchorPane();
-        homepageAnchorPane.setPrefSize(SysConfig.STAGE_WIDTH, SysConfig.STAGE_HEIGHT);
+        homepageAnchorPane.setPrefSize(AppUIConfig.STAGE_WIDTH, AppUIConfig.STAGE_HEIGHT);
 
         // 设置文本输入框
         setInputTextArea();
@@ -50,13 +51,13 @@ public class Homepage {
         homepageVBox.setVgrow(scrollPane, Priority.ALWAYS); // 将 scrollPane 中的会话窗口从最顶开始往下显示
         homepageVBox.getChildren().addAll(scrollPane, stackPane, buttonBox);
         homepageVBox.setSpacing(3);
-        homepageVBox.setPadding(new Insets(SysConfig.MARGIN_DEFAULT, 2, SysConfig.MARGIN_DEFAULT, 2));
+        homepageVBox.setPadding(new Insets(AppUIConfig.MARGIN_DEFAULT, 2, AppUIConfig.MARGIN_DEFAULT, 2));
         homepageVBox.setAlignment(Pos.BOTTOM_CENTER);
 
-        AnchorPane.setTopAnchor(homepageVBox, SysConfig.MARGIN_DEFAULT);
-        AnchorPane.setLeftAnchor(homepageVBox, SysConfig.MARGIN_DEFAULT);
-        AnchorPane.setRightAnchor(homepageVBox, SysConfig.MARGIN_DEFAULT);
-        AnchorPane.setBottomAnchor(homepageVBox, SysConfig.MARGIN_DEFAULT);
+        AnchorPane.setTopAnchor(homepageVBox, AppUIConfig.MARGIN_DEFAULT);
+        AnchorPane.setLeftAnchor(homepageVBox, AppUIConfig.MARGIN_DEFAULT);
+        AnchorPane.setRightAnchor(homepageVBox, AppUIConfig.MARGIN_DEFAULT);
+        AnchorPane.setBottomAnchor(homepageVBox, AppUIConfig.MARGIN_DEFAULT);
 
         homepageAnchorPane.getChildren().addAll(homepageVBox);
         return homepageAnchorPane;
@@ -65,7 +66,7 @@ public class Homepage {
 
     public static void freshChatMsgBox() {
         vbox.setAlignment(Pos.TOP_CENTER);
-        vbox.setSpacing(SysConfig.MARGIN_DEFAULT);
+        vbox.setSpacing(AppUIConfig.MARGIN_DEFAULT);
 
         // 先清除已有消息
         vbox.getChildren().clear();
@@ -80,7 +81,7 @@ public class Homepage {
             TextArea messageBox = createMessageBox(messageDTO.getContent());
             // 重建對話box
             HomepageStyle.styleTextArea(messageBox, messageDTO.getRole());
-            HomepageStyle.fontSizeTextArea(messageBox, SysConfig.FONT_SIZE);
+            HomepageStyle.fontSizeTextArea(messageBox, AppUIConfig.FONT_SIZE);
             vbox.getChildren().add(messageBox);
         }
 
@@ -117,7 +118,7 @@ public class Homepage {
 
     private static void setInputTextArea() {
         // 初始化TextArea的高度
-        textAreaInput.setPrefRowCount(SysConfig.TEXT_AREA_INPUT_BOX_ROW);
+        textAreaInput.setPrefRowCount(AppUIConfig.TEXT_AREA_INPUT_BOX_ROW);
         textAreaInput.setStyle("-fx-border-color: tomato");
         // 设置自动换行
         textAreaInput.setWrapText(true);

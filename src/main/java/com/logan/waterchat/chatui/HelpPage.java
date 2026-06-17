@@ -1,6 +1,7 @@
 package com.logan.waterchat.chatui;
 
 
+import com.logan.waterchat.config.AppUIConfig;
 import com.logan.waterchat.config.SysConfig;
 import com.logan.waterchat.config.SysConfigAction;
 import com.logan.waterchat.utils.AlertUtils;
@@ -29,15 +30,15 @@ public class HelpPage {
         VBox helpVBox = new VBox();
         helpVBox.getChildren().addAll(boxHelp);
         helpVBox.setSpacing(10);
-        helpVBox.setPadding(new Insets(SysConfig.MARGIN_DEFAULT, 0, SysConfig.MARGIN_DEFAULT, 0));
+        helpVBox.setPadding(new Insets(AppUIConfig.MARGIN_DEFAULT, 0, AppUIConfig.MARGIN_DEFAULT, 0));
         helpVBox.setAlignment(Pos.BASELINE_CENTER);
-        AnchorPane.setTopAnchor(helpVBox, SysConfig.MARGIN_DEFAULT);
-        AnchorPane.setLeftAnchor(helpVBox, SysConfig.MARGIN_DEFAULT);
-        AnchorPane.setRightAnchor(helpVBox, SysConfig.MARGIN_DEFAULT);
-        AnchorPane.setBottomAnchor(helpVBox, SysConfig.MARGIN_DEFAULT);
+        AnchorPane.setTopAnchor(helpVBox, AppUIConfig.MARGIN_DEFAULT);
+        AnchorPane.setLeftAnchor(helpVBox, AppUIConfig.MARGIN_DEFAULT);
+        AnchorPane.setRightAnchor(helpVBox, AppUIConfig.MARGIN_DEFAULT);
+        AnchorPane.setBottomAnchor(helpVBox, AppUIConfig.MARGIN_DEFAULT);
 
         AnchorPane helpAnchorPane = new AnchorPane();
-        helpAnchorPane.setPrefSize(SysConfig.STAGE_WIDTH, SysConfig.STAGE_HEIGHT);
+        helpAnchorPane.setPrefSize(AppUIConfig.STAGE_WIDTH, AppUIConfig.STAGE_HEIGHT);
         helpAnchorPane.getChildren().add(helpVBox);
 
         return helpAnchorPane;

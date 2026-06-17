@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.util.Objects;
 import java.util.Optional;
 
+
 public class AlertUtils {
 
     public static void openExplorer(String savePath) {
@@ -42,8 +43,8 @@ public class AlertUtils {
     public static void saveProductIntroduction(String savePath) {
         try {
             String fileFullName = "waterchat_product_introduction_cn.pdf";
-            LocalFileUtils.save2TempDir(LocalFileUtils.is2Byte(Objects.requireNonNull(AlertUtils.class.getClassLoader()
-                            .getResourceAsStream("asset/" + fileFullName))),
+            LocalFileUtils.save2TempDir(LocalFileUtils.is2Byte(Objects.requireNonNull(AlertUtils.class
+                            .getResourceAsStream("/asset/" + fileFullName))),
                     savePath, fileFullName);
 
         } catch (Exception e) {

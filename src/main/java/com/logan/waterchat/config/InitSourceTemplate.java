@@ -22,7 +22,9 @@ public class InitSourceTemplate {
             LogUtils.info("InitSourceTemplate start");
             LogUtils.info("os.name:" + AppSystemOS.name);
             LogUtils.info("os.arch:" + AppSystemOS.name);
+            // 初始化应用的基础配置，例如文件保存路径，资源路径
             init1();
+            // 初始化应用配置文件、执行文件
             init2();
             init3();
             initFinally();
@@ -60,7 +62,7 @@ public class InitSourceTemplate {
 
 
     public static void initAppSettingValue(){
-        SysConfig.APP_DOWNLOAD_PATH = getAppDownloadPath();
+        SysConfig.APP_DOWNLOAD_PATH = AppPathConfig.getAppDownloadPath();
         FileUtils.mkDir(SysConfig.APP_DOWNLOAD_PATH);
 
         SysConfig.LOG_CACHE_PATH = SysConfig.APP_DOWNLOAD_PATH + "log" + File.separator;
@@ -74,28 +76,11 @@ public class InitSourceTemplate {
 
     public static boolean isNeedInitResources() {
         // TODO hard code
-        File file = new File(getAppDownloadPath()  + "resources/modelsexec");
+        File file = new File(AppPathConfig.getAppDownloadPath()  + "resources/modelsexec");
         if (file.exists()) {
             return false;
         }
         return true;
     }
-
-
-    public static String getAppDownloadPath(){
-        String appDownloadPath ="";
-        File home = FileSystemView.getFileSystemView().getHomeDirectory();
-        if (AppSystemOS.isMacOS()) {
-            appDownloadPath = home.getAbsolutePath() + File.separator + "Downloads" + File.separator + "waterchat" + File.separator;
-        } else {
-            // windows多了\\Desktop，所以需要这样子变化 C:\\Users\\lance\\Desktop ==> C:\\Users\\lance
-            String originalPath = home.getAbsolutePath();
-            int lastIndexOfSeparator = originalPath.lastIndexOf("\\");
-            String newPath = originalPath.substring(0, lastIndexOfSeparator);
-            appDownloadPath = newPath + File.separator + "Downloads" + File.separator + "waterchat" + File.separator;
-        }
-        return appDownloadPath;
-    }
-
 
 }

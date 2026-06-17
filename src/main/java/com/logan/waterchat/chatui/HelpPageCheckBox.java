@@ -2,9 +2,11 @@ package com.logan.waterchat.chatui;
 
 
 import com.logan.waterchat.chat.init.ResourcesFileAppInit;
+import com.logan.waterchat.chat.llamaccp.LLaMAConf;
 import com.logan.waterchat.chat.llamaccp.LLaMAServerCtrl;
 import com.logan.waterchat.chat.refresh.RefreshConfig;
 import com.logan.waterchat.chat.refresh.RefreshUI;
+import com.logan.waterchat.config.AppUIConfig;
 import com.logan.waterchat.config.SysConfig;
 import com.logan.waterchat.config.SysConfigAction;
 import com.logan.waterchat.utils.AlertUtils;
@@ -127,33 +129,33 @@ public class HelpPageCheckBox {
         fontSizeChoices.add(SysConfigAction.getLang("fontSize") + ": " + "30");
         ChoiceBox fontSizeChoiceBox = new ChoiceBox();
         fontSizeChoiceBox.getItems().addAll(fontSizeChoices);
-        fontSizeChoiceBox.setValue(SysConfigAction.getLang("fontSize") + ": " + SysConfig.FONT_SIZE);
+        fontSizeChoiceBox.setValue(SysConfigAction.getLang("fontSize") + ": " + AppUIConfig.FONT_SIZE);
         fontSizeChoiceBox.setMinWidth(100);
         fontSizeChoiceBox.setMaxWidth(120);
 
         fontSizeChoiceBox.setOnAction((event) -> {
             int selectedIndex = fontSizeChoiceBox.getSelectionModel().getSelectedIndex();
             if (selectedIndex == 0) {
-                SysConfig.FONT_SIZE = 10;
+                AppUIConfig.FONT_SIZE = 10;
             } else if (selectedIndex == 1) {
-                SysConfig.FONT_SIZE = 12;
+                AppUIConfig.FONT_SIZE = 12;
             } else if (selectedIndex == 2) {
-                SysConfig.FONT_SIZE = 14;
+                AppUIConfig.FONT_SIZE = 14;
             } else if (selectedIndex == 3) {
-                SysConfig.FONT_SIZE = 16;
+                AppUIConfig.FONT_SIZE = 16;
             } else if (selectedIndex == 4) {
-                SysConfig.FONT_SIZE = 18;
+                AppUIConfig.FONT_SIZE = 18;
             } else if (selectedIndex == 5) {
-                SysConfig.FONT_SIZE = 20;
+                AppUIConfig.FONT_SIZE = 20;
             } else if (selectedIndex == 6) {
-                SysConfig.FONT_SIZE = 24;
+                AppUIConfig.FONT_SIZE = 24;
             } else if (selectedIndex == 7) {
-                SysConfig.FONT_SIZE = 30;
+                AppUIConfig.FONT_SIZE = 30;
             } else {
-                SysConfig.FONT_SIZE = 16;
+                AppUIConfig.FONT_SIZE = 16;
             }
 
-            SysConfigAction.updateConfigFontSize(SysConfig.FONT_SIZE);
+            SysConfigAction.updateConfigFontSize(AppUIConfig.FONT_SIZE);
             // 刷新字体大小
             Homepage.freshChatMsgBox();
         });
@@ -175,35 +177,35 @@ public class HelpPageCheckBox {
         AICreavitityChoices.add(SysConfigAction.getLang("AICreativity") + ": " + "0.9");
         ChoiceBox AICreativityChoiceBox = new ChoiceBox();
         AICreativityChoiceBox.getItems().addAll(AICreavitityChoices);
-        AICreativityChoiceBox.setValue(SysConfigAction.getLang("AICreativity") + ": " + SysConfig.AI_CREATIVITY);
+        AICreativityChoiceBox.setValue(SysConfigAction.getLang("AICreativity") + ": " + LLaMAConf.AI_CREATIVITY);
         AICreativityChoiceBox.setMinWidth(100);
         AICreativityChoiceBox.setMaxWidth(120);
 
         AICreativityChoiceBox.setOnAction((event) -> {
             int selectedIndex = AICreativityChoiceBox.getSelectionModel().getSelectedIndex();
             if (selectedIndex == 0) {
-                SysConfig.AI_CREATIVITY = 0.1;
+                LLaMAConf.AI_CREATIVITY = 0.1;
             } else if (selectedIndex == 1) {
-                SysConfig.AI_CREATIVITY = 0.2;
+                LLaMAConf.AI_CREATIVITY = 0.2;
             } else if (selectedIndex == 2) {
-                SysConfig.AI_CREATIVITY = 0.3;
+                LLaMAConf.AI_CREATIVITY = 0.3;
             } else if (selectedIndex == 3) {
-                SysConfig.AI_CREATIVITY = 0.4;
+                LLaMAConf.AI_CREATIVITY = 0.4;
             } else if (selectedIndex == 4) {
-                SysConfig.AI_CREATIVITY = 0.5;
+                LLaMAConf.AI_CREATIVITY = 0.5;
             } else if (selectedIndex == 5) {
-                SysConfig.AI_CREATIVITY = 0.6;
+                LLaMAConf.AI_CREATIVITY = 0.6;
             } else if (selectedIndex == 6) {
-                SysConfig.AI_CREATIVITY = 0.7;
+                LLaMAConf.AI_CREATIVITY = 0.7;
             } else if (selectedIndex == 7) {
-                SysConfig.AI_CREATIVITY = 0.8;
+                LLaMAConf.AI_CREATIVITY = 0.8;
             } else if (selectedIndex == 8) {
-                SysConfig.AI_CREATIVITY = 0.9;
+                LLaMAConf.AI_CREATIVITY = 0.9;
             } else {
-                SysConfig.AI_CREATIVITY = 0.3;
+                LLaMAConf.AI_CREATIVITY = 0.3;
             }
 
-            SysConfigAction.updateConfigAICreativity(SysConfig.AI_CREATIVITY);
+            SysConfigAction.updateConfigAICreativity(LLaMAConf.AI_CREATIVITY);
             LLaMAServerCtrl.restartLLaMAServer();
         });
 

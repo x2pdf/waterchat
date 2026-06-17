@@ -1,7 +1,6 @@
 package com.logan.waterchat.config;
 
-
-
+import com.logan.waterchat.chat.llamaccp.LLaMAConf;
 import com.logan.waterchat.utils.LogUtils;
 
 import java.io.*;
@@ -121,12 +120,12 @@ public class SysConfigAction {
     }
 
     public static void updateConfigFontSize(int fontSize) {
-        SysConfig.FONT_SIZE = fontSize;
+        AppUIConfig.FONT_SIZE = fontSize;
         SysConfigAction.updateConfigValue(getDefaultConfigPath(), "font_size", String.valueOf(fontSize));
     }
 
     public static void updateConfigAICreativity(double aiCreativity) {
-        SysConfig.AI_CREATIVITY = aiCreativity;
+        LLaMAConf.AI_CREATIVITY = aiCreativity;
         SysConfigAction.updateConfigValue(getDefaultConfigPath(), "--temp", String.valueOf(aiCreativity));
     }
 

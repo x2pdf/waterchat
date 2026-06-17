@@ -3,6 +3,7 @@ package com.logan.waterchat.chat.init;
 
 
 import com.logan.waterchat.chat.llamaccp.LLaMAConf;
+import com.logan.waterchat.config.AppUIConfig;
 import com.logan.waterchat.config.InitSourceTemplate;
 import com.logan.waterchat.config.SysConfig;
 import com.logan.waterchat.utils.AppSystemOS;
@@ -63,12 +64,12 @@ public class ConfigFileAppInit implements AppInitInterface {
 
         String fontSize = configHashMap.get("font_size");
         if (fontSize != null) {
-            SysConfig.FONT_SIZE = Integer.parseInt(fontSize);
+            AppUIConfig.FONT_SIZE = Integer.parseInt(fontSize);
         }
 
         String aiCreativity = configHashMap.get("--temp");
         if (aiCreativity != null) {
-            SysConfig.AI_CREATIVITY = Double.parseDouble(aiCreativity);
+            LLaMAConf.AI_CREATIVITY = Double.parseDouble(aiCreativity);
         }
 
         String lang = configHashMap.get("lang");
