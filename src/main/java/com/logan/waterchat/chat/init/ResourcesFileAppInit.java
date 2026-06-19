@@ -121,9 +121,9 @@ public class ResourcesFileAppInit implements AppInitInterface {
                 // macOS的情形： 因为zip压缩不会保留可执行文件的元信息导致可执行文件解压之后文件被破坏，所以只能使用 tar.gz 格式
                 // TODO 应用内文件名写死了，待优化。
                 FileUtils.extractTarGz(SysConfig.TEMP_RESOURCES_PATH + SysConfig.MODEL_EXEC_PATH, "llama-mac-arm64.tar.gz");
-                FileUtils.extractTarGz(SysConfig.TEMP_RESOURCES_PATH + SysConfig.MODEL_EXEC_PATH, "llama-mac-x64.tar.gz");
+//                FileUtils.extractTarGz(SysConfig.TEMP_RESOURCES_PATH + SysConfig.MODEL_EXEC_PATH, "llama-mac-x64.tar.gz");
                 FileUtils.deleteFile(SysConfig.TEMP_RESOURCES_PATH + SysConfig.MODEL_EXEC_PATH + "/llama-mac-arm64.tar.gz");
-                FileUtils.deleteFile(SysConfig.TEMP_RESOURCES_PATH + SysConfig.MODEL_EXEC_PATH + "/llama-mac-x64.tar.gz");
+//                FileUtils.deleteFile(SysConfig.TEMP_RESOURCES_PATH + SysConfig.MODEL_EXEC_PATH + "/llama-mac-x64.tar.gz");
 
                 grantMacOSPermissions(llamaExecPath);
             } else {

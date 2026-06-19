@@ -1,9 +1,5 @@
 config/=config.txt
 config/=resourcefilepath.txt
-models/Qwen3.5-0.8B-GGUF/=Qwen3.5-0.8B-Q8_0.gguf
-models/Qwen3.5-0.8B-GGUF/=gitattributes
-models/Qwen3.5-0.8B-GGUF/=mmproj-Qwen3.5-0.8B-BF16.gguf
-models/Qwen3.5-0.8B-GGUF/=README.md
+models/gemma/=gemma-3-1b-it-Q4_K_M.gguf
 modelsexec/=llama-mac-arm64.tar.gz
-modelsexec/=llama-mac-x64.tar.gz
 

@@ -18,10 +18,10 @@ public class LLaMAParams {
         for (String key : allConfigKeyValue.keySet()) {
             if ("-ngl".equals(key)) {
                 ngl = allConfigKeyValue.get(key);
-                // 如果启用了vulkan但是配置文件中没有做的对应的设定的，其中： -ngl -1 → 尽量把所有层都放 GPU（如果显存够的话）
+                // 如果启用了vulkan但是配置文件中没有做的对应的设定的情形
                 if (SysConfig.IS_USE_VULKAN){
                     if (Integer.parseInt(allConfigKeyValue.get(key)) == 0){
-                        ngl = "-1";
+                        ngl = "9999";
                     }
                 }
                 continue;
@@ -83,7 +83,7 @@ public class LLaMAParams {
         }
 
         // --reasoning-budget 0 ，支持 reasoning 的新版 llama.cpp，可以让模型尽量不思考。
-        llamaParams = llamaParams + " --reasoning-budget 0 --no-context-shift";
+        llamaParams = llamaParams + " --reasoning-budget 0 --no-context-shift --ui";
         return llamaParams;
     }
 

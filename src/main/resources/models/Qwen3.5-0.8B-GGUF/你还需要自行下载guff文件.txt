@@ -1,4 +1,0 @@
-你还需要自行下载guff文件（文件太大，不好上传到github）
-
-Qwen3.5-0.8B-Q8_0.gguf
-mmproj-Qwen3.5-0.8B-BF16.gguf
