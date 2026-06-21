@@ -11,7 +11,12 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <javafx.platform>mac-aarch64</javafx.platform>
+<!--        macOS Apple Silicon 芯片的配置-->
+<!--        <javafx.platform>mac-aarch64</javafx.platform>-->
+        <!--        Windows 32位系统上配置 -->
+<!--        <javafx.platform>win-x86</javafx.platform>-->
+<!--        Windows 64 位 (x86_64) 系统上配置 -->
+<!--        <javafx.platform>win-x64</javafx.platform>-->
     </properties>
 
     <dependencies>
@@ -19,7 +24,7 @@
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-controls</artifactId>
             <version>25.0.3</version>
-            <classifier>${javafx.platform}</classifier>
+<!--            <classifier>${javafx.platform}</classifier>-->
         </dependency>
         <!-- Source: https://mvnrepository.com/artifact/org.controlsfx/controlsfx -->
         <dependency>
