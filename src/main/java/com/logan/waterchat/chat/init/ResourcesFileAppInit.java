@@ -1,6 +1,8 @@
 package com.logan.waterchat.chat.init;
 
 
+import com.logan.waterchat.chat.init.helper.ModelsExecHelper;
+import com.logan.waterchat.chat.init.helper.ModelsUnzipHelper;
 import com.logan.waterchat.chat.llamaccp.LLaMAConf;
 import com.logan.waterchat.config.SysConfig;
 import com.logan.waterchat.config.SysConfigAction;
@@ -79,23 +81,10 @@ public class ResourcesFileAppInit implements AppInitInterface {
                     FileUtils fileUtils = new FileUtils();
                     fileUtils.copyFile(filePath + fileName, configTempPath + fileName);
 
-                    if (line.contains("modelsexec")) {
-                        // MacOS 要授权, 才能执行命令行
-                        if (SysConfigAction.isMacOS()) {
-                            LogUtils.info("给复制的 modelsexec 文件授权：可执行 chmod +x. file: " + configTempPath + fileName);
-                            Process process = Runtime.getRuntime().exec("chmod +x " + configTempPath + fileName);
-                        }
-                    }
-                    if (SysConfigAction.isMacOS() && !line.contains("modelsexec")) {
-                        try {
-                            ProcessBuilder xattrProcess = new ProcessBuilder(
-                                    "xattr", "-d", "com.apple.quarantine", configTempPath + fileName
-                            );
-                            xattrProcess.start().waitFor();
-                        } catch (Exception e) {
-                            LogUtils.error("移除 quarantine 失败: " + e.getMessage());
-                        }
-                    }
+                    // 特殊处理
+                    ModelsExecHelper.setChomd2ExecFiles(line, configTempPath, fileName);
+                    ModelsExecHelper.setChomd2ExecFiles(line, configTempPath, fileName);
+                    ModelsUnzipHelper.unzipModelFile(line, configTempPath, fileName);
                 }
             }
         }
@@ -119,7 +108,7 @@ public class ResourcesFileAppInit implements AppInitInterface {
         try {
             if (System.getProperty("os.name").toLowerCase().contains("mac")) {
                 // macOS的情形： 因为zip压缩不会保留可执行文件的元信息导致可执行文件解压之后文件被破坏，所以只能使用 tar.gz 格式
-                // TODO 应用内文件名写死了，待优化。
+                // TODO *** 应用内文件名写死了，待优化。
                 FileUtils.extractTarGz(SysConfig.TEMP_RESOURCES_PATH + SysConfig.MODEL_EXEC_PATH, "llama-mac-arm64.tar.gz");
 //                FileUtils.extractTarGz(SysConfig.TEMP_RESOURCES_PATH + SysConfig.MODEL_EXEC_PATH, "llama-mac-x64.tar.gz");
                 FileUtils.deleteFile(SysConfig.TEMP_RESOURCES_PATH + SysConfig.MODEL_EXEC_PATH + "/llama-mac-arm64.tar.gz");

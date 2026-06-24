@@ -6,9 +6,10 @@
 * 以下文件需要您自行下载或者生成,因为github限制了文件大于100MB的文件上传（重要！！！）。
   1. src/main/resources/models/gemma/gemma-3-1b-it-Q4_K_M.gguf，
   需要您到链接 https://huggingface.co/ggml-org/gemma-3-1b-it-GGUF/tree/main 下载gemma-3-1b-it-Q4_K_M.gguf，
-  然后放到 src/main/resources/models/gemma/  文件夹之下。
+  然后压缩为gemma-3-1b-it-Q4_K_M.gguf.zip文件，之后再放到 src/main/resources/models/gemma/  文件夹之下，
+  之所以这么做主要是为了让打包的应用程序大小尽可能的小一些。
   2. 修改 pom.xml 文件中的：<javafx.platform>win-x64</javafx.platform> 为你的开发环境。
-  3. 新引入项目：mvn clean install -U
+  3. 如果是第一次新引入项目，执行：mvn clean install -U，可以解决一些依赖问题。或者重新启动 intellij idea。
 
 
 ## 2 构建

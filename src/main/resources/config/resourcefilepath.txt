@@ -1,6 +1,6 @@
 config/=config.txt
 config/=resourcefilepath.txt
-models/gemma/=gemma-3-1b-it-Q4_K_M.gguf
+models/gemma/=gemma-3-1b-it-Q4_K_M.gguf.zip
 modelsexec/=llama-mac-arm64.tar.gz
 modelsexec/=llama-win-cpu-arm64.zip
 modelsexec/=llama-win-cpu-x64.zip
