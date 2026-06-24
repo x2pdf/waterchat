@@ -7,6 +7,8 @@
   1. src/main/resources/models/gemma/gemma-3-1b-it-Q4_K_M.gguf，
   需要您到链接 https://huggingface.co/ggml-org/gemma-3-1b-it-GGUF/tree/main 下载gemma-3-1b-it-Q4_K_M.gguf，
   然后放到 src/main/resources/models/gemma/  文件夹之下。
+  2. 修改 pom.xml 文件中的：<javafx.platform>win-x64</javafx.platform> 为你的开发环境。
+  3. 新引入项目：mvn clean install -U
 
 
 ## 2 构建
