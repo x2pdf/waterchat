@@ -1,5 +1,6 @@
-package com.logan.waterchat.utils;
+package com.logan.waterchat.chatui;
 
+import com.logan.waterchat.utils.LocalFileUtils;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import java.awt.*;

@@ -2,12 +2,11 @@ package com.logan.waterchat.chatui;
 
 
 
-import com.logan.waterchat.chat.AIModelNameDTO;
+import com.logan.waterchat.chat.model.AIModelNameDTO;
 import com.logan.waterchat.chat.refresh.RefreshConfig;
-import com.logan.waterchat.chat.widgets.AIModelMainFilePathHBox;
+import com.logan.waterchat.chatui.widgets.AIModelMainFilePathHBox;
 import com.logan.waterchat.config.SysConfig;
 import com.logan.waterchat.config.SysConfigAction;
-import com.logan.waterchat.utils.AlertUtils;
 import com.logan.waterchat.utils.LogUtils;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;

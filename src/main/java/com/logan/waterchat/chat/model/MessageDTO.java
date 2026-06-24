@@ -1,5 +1,4 @@
-package com.logan.waterchat.chat;
-
+package com.logan.waterchat.chat.model;
 
 
 public class MessageDTO {

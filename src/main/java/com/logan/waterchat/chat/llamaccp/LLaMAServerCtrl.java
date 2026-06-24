@@ -1,11 +1,11 @@
 package com.logan.waterchat.chat.llamaccp;
 
 
-import com.logan.waterchat.chat.MessageResDTO;
+import com.logan.waterchat.chat.model.MessageResDTO;
 import com.logan.waterchat.chatui.HomepageAdaptor;
 import com.logan.waterchat.config.SysConfig;
 import com.logan.waterchat.config.SysConfigAction;
-import com.logan.waterchat.utils.AlertUtils;
+import com.logan.waterchat.chatui.AlertUtils;
 import com.logan.waterchat.utils.LogUtils;
 
 import java.io.BufferedReader;

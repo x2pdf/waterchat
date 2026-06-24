@@ -1,12 +1,11 @@
 package com.logan.waterchat.chatui;
 
 
-import com.logan.waterchat.chat.ChatRoleEnum;
-import com.logan.waterchat.chat.MessageDTO;
-import com.logan.waterchat.chat.SessionCtrl;
+import com.logan.waterchat.chat.model.ChatRoleEnum;
+import com.logan.waterchat.chat.model.MessageDTO;
+import com.logan.waterchat.chat.model.SessionCtrl;
 import com.logan.waterchat.chat.llamaccp.LLaMAServerCtrl;
 import com.logan.waterchat.utils.LogUtils;
-import javafx.application.Platform;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 

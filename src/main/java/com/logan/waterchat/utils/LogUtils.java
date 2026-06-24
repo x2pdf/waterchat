@@ -4,7 +4,7 @@ package com.logan.waterchat.utils;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.logan.waterchat.chat.MessageDTO;
+import com.logan.waterchat.chat.model.MessageDTO;
 import com.logan.waterchat.config.SysConfig;
 
 import java.io.File;

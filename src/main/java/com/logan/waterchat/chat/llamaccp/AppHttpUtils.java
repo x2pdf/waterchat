@@ -3,7 +3,7 @@ package com.logan.waterchat.chat.llamaccp;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.logan.waterchat.chat.MessageResDTO;
+import com.logan.waterchat.chat.model.MessageResDTO;
 import com.logan.waterchat.utils.LogUtils;
 import java.io.InputStream;
 import java.net.URI;

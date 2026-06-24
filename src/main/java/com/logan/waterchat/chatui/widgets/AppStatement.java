@@ -1,4 +1,4 @@
-package com.logan.waterchat.chat.widgets;
+package com.logan.waterchat.chatui.widgets;
 
 public class AppStatement {
     public static String appStatement =

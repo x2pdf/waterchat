@@ -6,8 +6,8 @@ import java.util.HashMap;
 
 public class SysConfig {
     public static String APP_NAME = "WaterChat";
-    public static String MODEL_NAME = "Qwen3.5-0.8B-GGUF/Qwen3.5-0.8B-Q8_0.gguf";  // 需要指定到 xxxx.gguf 文件为止
-    public static String MODEL_PATH = "Qwen3.5-0.8B-GGUF/Qwen3.5-0.8B-Q8_0.gguf";  // 需要指定到 xxxx.gguf 文件为止
+    public static String MODEL_NAME = "gemma/gemma-3-1b-it-Q4_K_M.gguf";  // 需要指定到 xxxx.gguf 文件为止
+    public static String MODEL_PATH = "gemma/gemma-3-1b-it-Q4_K_M.gguf";  // 需要指定到 xxxx.gguf 文件为止
     public static ArrayList<String> MODEL_NAME_LIST = new ArrayList<>();
     public static String MODEL_DEFAULT_SYSTEM_PROMPT = "你是一个博览群书、上知天文下知地理、深刻理解人类世界各种经验的AI，" +
             "你不仅心思缜密，有崇高的道德感，还洋溢热情乐于助人，" +
@@ -42,6 +42,7 @@ public class SysConfig {
     // 应用日志的文件名称
     public static String APP_LOG_FILE_NAME = "app_server_log.txt";
 
+    // 配置文件中的键值对
     public static HashMap<String, String> configHashMap = new HashMap<>();
 
 }

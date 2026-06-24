@@ -1,7 +1,7 @@
 package com.logan.waterchat.chatui;
 
 
-import com.logan.waterchat.chat.ChatRoleEnum;
+import com.logan.waterchat.chat.model.ChatRoleEnum;
 import javafx.scene.control.TextArea;
 
 import java.util.regex.Matcher;

@@ -1,7 +1,7 @@
 package com.logan.waterchat.chatui;
 
 
-import com.logan.waterchat.chat.SessionCtrl;
+import com.logan.waterchat.chat.model.SessionCtrl;
 import com.logan.waterchat.chat.llamaccp.LLaMAConf;
 import com.logan.waterchat.config.SysConfigAction;
 import com.logan.waterchat.utils.LogUtils;

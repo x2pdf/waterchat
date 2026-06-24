@@ -1,4 +1,4 @@
-package com.logan.waterchat.chat.widgets;
+package com.logan.waterchat.chatui.widgets;
 
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;

@@ -9,7 +9,6 @@ import com.logan.waterchat.chat.refresh.RefreshUI;
 import com.logan.waterchat.config.AppUIConfig;
 import com.logan.waterchat.config.SysConfig;
 import com.logan.waterchat.config.SysConfigAction;
-import com.logan.waterchat.utils.AlertUtils;
 import com.logan.waterchat.utils.LogUtils;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ChoiceBox;

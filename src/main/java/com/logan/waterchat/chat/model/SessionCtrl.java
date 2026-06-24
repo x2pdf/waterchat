@@ -1,4 +1,4 @@
-package com.logan.waterchat.chat;
+package com.logan.waterchat.chat.model;
 
 
 

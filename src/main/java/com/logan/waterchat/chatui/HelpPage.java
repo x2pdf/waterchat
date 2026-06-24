@@ -4,7 +4,6 @@ package com.logan.waterchat.chatui;
 import com.logan.waterchat.config.AppUIConfig;
 import com.logan.waterchat.config.SysConfig;
 import com.logan.waterchat.config.SysConfigAction;
-import com.logan.waterchat.utils.AlertUtils;
 import com.logan.waterchat.utils.LogUtils;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
