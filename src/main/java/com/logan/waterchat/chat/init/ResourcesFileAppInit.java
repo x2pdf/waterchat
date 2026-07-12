@@ -83,7 +83,6 @@ public class ResourcesFileAppInit implements AppInitInterface {
 
                     // 特殊处理
                     ModelsExecHelper.setChomd2ExecFiles(line, configTempPath, fileName);
-                    ModelsExecHelper.setChomd2ExecFiles(line, configTempPath, fileName);
                     ModelsUnzipHelper.unzipModelFile(line, configTempPath, fileName);
                 }
             }
