@@ -14,8 +14,8 @@ public class SysConfig {
             "对于每一次提供的回答不仅提供最恰当最严谨的直切要点的回复，同时还提供给用户可能进一步需要的信息或提示，你是人类最好的朋友！";
 
     public static boolean IS_MACOS = true;
-    public static String CONFIG_PATH = "config/config.txt";
-    public static String RESOURCE_MOVE_CONFIG_PATH = "config/resourcefilepath.txt";
+    public static String CONFIG_PATH = "config/config.properties";
+    public static String RESOURCE_MOVE_CONFIG_PATH = "config/resourcefilepath.properties";
     public static String MODEL_EXEC_PATH = "modelsexec";
 
 

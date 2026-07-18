@@ -14,16 +14,16 @@ public class ModelsExecHelper {
      * 通过chmod命令为可执行文件添加执行权限。
      *
      * @param line 需要检查的行内容，用于判断是否包含"modelsexec"标识
-     * @param configTempPath 配置文件临时路径，与fileName拼接形成完整文件路径
-     * @param fileName 文件名，与configTempPath拼接形成完整文件路径
+     * @param fileAbsName 文件绝对路径
+
      */
-    public static void setChomd2ExecFiles(String line, String configTempPath, String fileName){
-        if (line.contains("modelsexec")) {
+    public static void setChomd2ExecFiles(String line, String fileAbsName){
+        if (line.contains("modelsexec") && line.endsWith(".gz")) {
             // MacOS 要授权, 才能执行命令行
             if (SysConfigAction.isMacOS()) {
-                LogUtils.info("给复制的 modelsexec 文件授权：可执行 chmod +x. file: " + configTempPath + fileName);
+                LogUtils.info("给复制的 modelsexec 文件授权：可执行 chmod +x. file: " + fileAbsName);
                 try {
-                    Process process = Runtime.getRuntime().exec("chmod +x " + configTempPath + fileName);
+                    Process process = Runtime.getRuntime().exec("chmod +x " + fileAbsName);
                 } catch (IOException e) {
                     LogUtils.error("给复制的 modelsexec 文件授权失败: " + e.getMessage());
                     throw new RuntimeException(e);

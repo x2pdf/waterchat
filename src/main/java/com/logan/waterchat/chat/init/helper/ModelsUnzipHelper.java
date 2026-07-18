@@ -13,16 +13,15 @@ public class ModelsUnzipHelper {
      * 将模型压缩文件解压到同一目录，并删除原始压缩文件。
      *
      * @param line 需要检查的行内容，用于判断是否包含"models"标识
-     * @param configTempPath 配置文件临时路径，与fileName拼接形成完整文件路径
-     * @param fileName 文件名，需为.zip格式的压缩文件
+     * @param fileAbsName 配置文件绝对路径文件名
      */
-    public static void unzipModelFile(String line, String configTempPath, String fileName){
+    public static void unzipModelFile(String line,  String fileAbsName){
         // 解压模型文件
-        if (line.contains("models") && fileName.endsWith(".zip")) {
+        if (line.contains("models") && line.endsWith(".zip")) {
             // gemma-3-1b-it-Q4_K_M.gguf.zip
             try {
-                FileUtils.unzipToSameDirectory(configTempPath + fileName);
-                FileUtils.deleteFile(configTempPath + fileName);
+                FileUtils.unzipToSameDirectory(fileAbsName);
+                FileUtils.deleteFile(fileAbsName);
             }catch (Exception e){
                 LogUtils.error("解压AI模型文件失败: " + e.getMessage());
             }

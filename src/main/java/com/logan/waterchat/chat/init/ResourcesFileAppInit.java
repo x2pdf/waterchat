@@ -14,6 +14,7 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Objects;
+import java.util.Properties;
 
 public class ResourcesFileAppInit implements AppInitInterface {
 
@@ -59,33 +60,31 @@ public class ResourcesFileAppInit implements AppInitInterface {
 
 
     /**
-     * 将jar包中的 resource/config/resourcefilepath.txt 配置的所有文件，复制到APP本地到文件夹下 resources 文件夹当中
+     * 将jar包中的 resource/config/resourcefilepath.properties 配置的所有文件，复制到APP本地到文件夹下 resources 文件夹当中
      *
      * @throws IOException
      */
     private void moveFileItems() throws IOException {
         FileUtils.mkDir(SysConfig.APP_DOWNLOAD_PATH + "/resources/modelsexec");
-//        InputStream resourceAsStream = getClass().getClassLoader().getResourceAsStream(SysConfig.RESOURCE_MOVE_CONFIG_PATH);
         // 模块化适配方法
         InputStream resourceAsStream = getClass().getResourceAsStream("/" + SysConfig.RESOURCE_MOVE_CONFIG_PATH);
-        ArrayList<String> lines = readFileLines(resourceAsStream);
-        if (lines.size() > 0) {
-            for (String line : lines) {
-                String[] parts = line.split("=");
-                if (parts.length == 2) {
-                    String filePath = parts[0].trim();
-                    String fileName = parts[1].trim();
-                    LogUtils.info("moveFile: " + filePath + fileName);
-                    String configTempPath = FileUtils.mkDir(SysConfig.APP_DOWNLOAD_PATH + "resources/" + filePath);
+        
+        Properties properties = new Properties();
+        properties.load(new InputStreamReader(resourceAsStream, StandardCharsets.UTF_8));
+        
+        for (String key : properties.stringPropertyNames()) {
+            String fileAbsName = properties.getProperty(key).trim();
+            LogUtils.info("moveFile: " + fileAbsName);
+            String directoryPath = fileAbsName.substring(0, fileAbsName.lastIndexOf('/') + 1);
+            FileUtils.mkDir(SysConfig.APP_DOWNLOAD_PATH + "resources/" + directoryPath);
+            String configTempPathFileName = SysConfig.APP_DOWNLOAD_PATH + "resources/" + fileAbsName;
 
-                    FileUtils fileUtils = new FileUtils();
-                    fileUtils.copyFile(filePath + fileName, configTempPath + fileName);
+            FileUtils fileUtils = new FileUtils();
+            fileUtils.copyFile(fileAbsName, configTempPathFileName);
 
-                    // 特殊处理
-                    ModelsExecHelper.setChomd2ExecFiles(line, configTempPath, fileName);
-                    ModelsUnzipHelper.unzipModelFile(line, configTempPath, fileName);
-                }
-            }
+            // 特殊处理
+            ModelsExecHelper.setChomd2ExecFiles(fileAbsName, configTempPathFileName);
+            ModelsUnzipHelper.unzipModelFile(fileAbsName,  configTempPathFileName);
         }
     }
 
@@ -104,19 +103,36 @@ public class ResourcesFileAppInit implements AppInitInterface {
 
     private void unzipLLaMAFile() {
         String llamaExecPath = LLaMAConf.getLLaMAExecAbsPath();
+        String tarGzFileName = "llama-mac-arm64.tar.gz";
+        String tarGzFilePath = SysConfig.TEMP_RESOURCES_PATH + SysConfig.MODEL_EXEC_PATH + "/" + tarGzFileName;
+        
         try {
             if (System.getProperty("os.name").toLowerCase().contains("mac")) {
-                // macOS的情形： 因为zip压缩不会保留可执行文件的元信息导致可执行文件解压之后文件被破坏，所以只能使用 tar.gz 格式
-                // TODO *** 应用内文件名写死了，待优化。
-                FileUtils.extractTarGz(SysConfig.TEMP_RESOURCES_PATH + SysConfig.MODEL_EXEC_PATH, "llama-mac-arm64.tar.gz");
-//                FileUtils.extractTarGz(SysConfig.TEMP_RESOURCES_PATH + SysConfig.MODEL_EXEC_PATH, "llama-mac-x64.tar.gz");
-                FileUtils.deleteFile(SysConfig.TEMP_RESOURCES_PATH + SysConfig.MODEL_EXEC_PATH + "/llama-mac-arm64.tar.gz");
-//                FileUtils.deleteFile(SysConfig.TEMP_RESOURCES_PATH + SysConfig.MODEL_EXEC_PATH + "/llama-mac-x64.tar.gz");
-
+                File tarGzFile = new File(tarGzFilePath);
+                if (!tarGzFile.exists()) {
+                    LogUtils.error("tar.gz 文件不存在: " + tarGzFilePath);
+                    return;
+                }
+                
+                LogUtils.info("开始解压 macOS llama 文件: " + tarGzFilePath);
+                FileUtils.extractTarGz(SysConfig.TEMP_RESOURCES_PATH + SysConfig.MODEL_EXEC_PATH, tarGzFileName);
+                
+                if (tarGzFile.exists()) {
+                    FileUtils.deleteFile(tarGzFilePath);
+                    LogUtils.info("已删除压缩包: " + tarGzFilePath);
+                }
+                
                 grantMacOSPermissions(llamaExecPath);
             } else {
-                // windows 使用zip压缩文件
-                FileUtils.unzipToSameDirectory(llamaExecPath + ".zip");
+                String zipFilePath = llamaExecPath + ".zip";
+                File zipFile = new File(zipFilePath);
+                if (!zipFile.exists()) {
+                    LogUtils.error("zip 文件不存在: " + zipFilePath);
+                    return;
+                }
+                
+                LogUtils.info("开始解压 Windows llama 文件: " + zipFilePath);
+                FileUtils.unzipToSameDirectory(zipFilePath);
             }
         } catch (Exception e) {
             LogUtils.error("unzipLLaMAFile exception. info: " + e);

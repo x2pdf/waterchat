@@ -12,14 +12,12 @@ public class FileUtils {
 
 
     /**
-     * @param fileName 形如： config/config.txt
-     * @param filePath 形如：/Users/megan/Downloads/waterchat/resources/config/config.txt
+     * @param fileName 形如： config/config.properties
+     * @param filePath 形如：/Users/megan/Downloads/waterchat/resources/config/config.properties
      * @throws IOException
      */
     public void copyFile(String fileName, String filePath) {
         try {
-//            InputStream input = getClass().getClassLoader().getResourceAsStream(fileName);
-
             // 模块化适配方法
             InputStream input = getClass().getResourceAsStream("/" + fileName);
             if (input == null) {
@@ -47,28 +45,43 @@ public class FileUtils {
         if (!dir.exists() || !dir.isDirectory()) {
             throw new IllegalArgumentException("无效的文件夹路径: " + folderAbsolutePath);
         }
-        System.out.println("folderAbsolutePath：  " + new File(folderAbsolutePath).getAbsolutePath());
+        
+        File tarGzFile = new File(dir, tarGzFileName);
+        if (!tarGzFile.exists()) {
+            throw new FileNotFoundException("tar.gz 文件不存在: " + tarGzFile.getAbsolutePath());
+        }
+        
+        LogUtils.info("开始解压文件: " + tarGzFile.getAbsolutePath());
+        
         ProcessBuilder pb = new ProcessBuilder("tar", "-xzvf", tarGzFileName);
-        // 设置命令执行目录
         pb.directory(dir);
-        // 合并标准输出和错误输出
         pb.redirectErrorStream(true);
-
+        
         Process process = pb.start();
-
-        // 打印执行输出（可选）
+        
+        StringBuilder output = new StringBuilder();
         try (BufferedReader reader = new BufferedReader(
                 new InputStreamReader(process.getInputStream()))) {
             String line;
             while ((line = reader.readLine()) != null) {
-                System.out.println(line);
+                output.append(line).append("\n");
+                LogUtils.info(line);
             }
         }
 
         int exitCode = process.waitFor();
         if (exitCode != 0) {
-            throw new RuntimeException("tar 解压失败，退出码: " + exitCode);
+            String errorMsg = String.format(
+                "tar 解压失败，退出码: %d\n文件路径: %s\n输出信息:\n%s",
+                exitCode,
+                tarGzFile.getAbsolutePath(),
+                output.toString()
+            );
+            LogUtils.error(errorMsg);
+            throw new RuntimeException(errorMsg);
         }
+        
+        LogUtils.info("tar 解压成功: " + tarGzFileName);
     }
 
     public static void deleteFile(String filePath) throws IOException {
@@ -86,7 +99,6 @@ public class FileUtils {
     public static void unzipToSameDirectory(String zipFilePath) throws IOException {
 
         File zipFile = new File(zipFilePath);
-
         if (!zipFile.exists() || !zipFile.isFile()) {
 //            throw new FileNotFoundException("Zip file not found: " + zipFilePath);
             return;
@@ -94,15 +106,11 @@ public class FileUtils {
 
         File targetDir = zipFile.getParentFile();
         byte[] buffer = new byte[8192];
-
         try (ZipInputStream zis = new ZipInputStream(new FileInputStream(zipFile))) {
 
             ZipEntry entry;
-
             while ((entry = zis.getNextEntry()) != null) {
-
                 File newFile = new File(targetDir, entry.getName());
-
                 // 防止 Zip Slip 漏洞
                 String canonicalTargetDirPath = targetDir.getCanonicalPath();
                 String canonicalNewFilePath = newFile.getCanonicalPath();
@@ -115,7 +123,6 @@ public class FileUtils {
                 } else {
                     // 确保父目录存在
                     new File(newFile.getParent()).mkdirs();
-
                     try (FileOutputStream fos = new FileOutputStream(newFile);
                          BufferedOutputStream bos = new BufferedOutputStream(fos, buffer.length)) {
 
@@ -150,10 +157,6 @@ public class FileUtils {
 
     public static String chooseFile(Stage stage) {
         FileChooser fileChooser = new FileChooser();
-        // 可选：设置初始目录
-//        fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));
-        // 可选：设置文件过滤器（这里示例只允许txt和所有文件）
-//        FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("文本文件 (*.txt)", "*.txt");
         FileChooser.ExtensionFilter allFilter = new FileChooser.ExtensionFilter("所有文件 (*.*)", "*.*");
         fileChooser.getExtensionFilters().addAll(allFilter);
         // 弹出文件选择对话框
