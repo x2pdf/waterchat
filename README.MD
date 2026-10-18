@@ -35,7 +35,7 @@
 
 # 下载 WaterChat
 
-* 稳定版本：https://github.com/x2pdf/waterchat/releases/tag/v26.03
+* 稳定版本：https://github.com/x2pdf/waterchat/releases/tag/v26.04
 
 ## Tips
 1.在MacOS首次安装打开之后，通常需要用户在Mac的 "设置-安全与隐私" 里面允许本应用运行，否则系统可能会提示本应用文件破损，不能打开运行之类的信息。

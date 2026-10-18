@@ -92,7 +92,7 @@ public class HelpPage {
 
 
         Text adv = new Text(SysConfigAction.getLang("productSlogan"));
-        Text version = new Text("WaterChat version 26.");
+        Text version = new Text("WaterChat version 26.04");
         Text author = new Text("Author: Logan Cham.");
         Text allRight = new Text("All Rights Reserved.");
         VBox vBox;
