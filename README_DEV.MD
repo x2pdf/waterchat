@@ -92,13 +92,7 @@ cmake --build build-metal --config Release -t llama-server -j$(sysctl -n hw.ncpu
 将压缩好的文件放入src/main/resources/modelsexec文件，替换旧版本的文件，完成llama.cpp的更新。
 
 
-
-## 4 兼容的AI模型说明
-*本应用应当都能够支持阿里巴巴通义千问 Qwen3 GGUF 类型的 AI 文本对话大模型。
-
-*本应用理论上能兼容（加载运行）所有 GGUF 类型的 AI 文本对话大模型。
-
-## 5 快速添加同类型模型（已有安装本应用在电脑）
+## 4 快速添加同类型模型（已有安装本应用在电脑）
 * 1找到本应用在电脑上的waterchat文件夹
 * 2在 waterchat/resoueces/models/ 创建你模型名称的文件夹，例如 Qwen3-1.7B-GGUF
 * 3将你的模型的所有参数文件下载并放到waterchat/resoueces/models/Qwen3-1.7B-GGUF 文件夹里面
@@ -107,7 +101,7 @@ cmake --build build-metal --config Release -t llama-server -j$(sysctl -n hw.ncpu
 * 5启动本应用，切换到help页面，选择切换模型为 Qwen3-1.7B-GGUF/Qwen3-1.7B-Q8_0.gguf即可，有时可能需要退出应用再次打开本应用切换模型才能生效。
 * 强烈提醒：总之模型要制定到具体的 xxxx.gguf 文件为止。
 
-## 6 llama.cpp启动参数含义
+## 5 llama.cpp启动参数含义
 max_new_tokens=4096          # 最大生成Token数量（Transformers/OpenAI风格参数，不是llama.cpp原生命令行参数）
 
 torch_dtype=auto            # 自动选择模型数据类型（FP16/BF16/FP32等），仅PyTorch/Transformers相关

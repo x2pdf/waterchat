@@ -163,52 +163,49 @@ public class HelpPageCheckBox {
     }
 
     public static ChoiceBox getAICreativityChoiceBox() {
-        // hardcode
-        ArrayList<String> AICreavitityChoices = new ArrayList<>();
-        AICreavitityChoices.add(SysConfigAction.getLang("AICreativity") + ": " + "0.1");
-        AICreavitityChoices.add(SysConfigAction.getLang("AICreativity") + ": " + "0.2");
-        AICreavitityChoices.add(SysConfigAction.getLang("AICreativity") + ": " + "0.3");
-        AICreavitityChoices.add(SysConfigAction.getLang("AICreativity") + ": " + "0.4");
-        AICreavitityChoices.add(SysConfigAction.getLang("AICreativity") + ": " + "0.5");
-        AICreavitityChoices.add(SysConfigAction.getLang("AICreativity") + ": " + "0.6");
-        AICreavitityChoices.add(SysConfigAction.getLang("AICreativity") + ": " + "0.7");
-        AICreavitityChoices.add(SysConfigAction.getLang("AICreativity") + ": " + "0.8");
-        AICreavitityChoices.add(SysConfigAction.getLang("AICreativity") + ": " + "0.9");
+        ArrayList<String> responseStyleChoices = new ArrayList<>();
+        responseStyleChoices.add(getResponseStyleChoice("responseStyleStrict"));
+        responseStyleChoices.add(getResponseStyleChoice("responseStyleBalanced"));
+        responseStyleChoices.add(getResponseStyleChoice("responseStyleFlexible"));
+        responseStyleChoices.add(getResponseStyleChoice("responseStyleCreative"));
+        responseStyleChoices.add(getResponseStyleChoice("responseStyleBold"));
+
+        double[] responseStyleTemperatures = {0.1, 0.3, 0.5, 0.7, 0.9};
         ChoiceBox AICreativityChoiceBox = new ChoiceBox();
-        AICreativityChoiceBox.getItems().addAll(AICreavitityChoices);
-        AICreativityChoiceBox.setValue(SysConfigAction.getLang("AICreativity") + ": " + LLaMAConf.AI_CREATIVITY);
-        AICreativityChoiceBox.setMinWidth(100);
-        AICreativityChoiceBox.setMaxWidth(120);
+        AICreativityChoiceBox.getItems().addAll(responseStyleChoices);
+        AICreativityChoiceBox.setValue(responseStyleChoices.get(getResponseStyleIndex(LLaMAConf.AI_CREATIVITY)));
+        AICreativityChoiceBox.setMinWidth(120);
+        AICreativityChoiceBox.setMaxWidth(180);
 
         AICreativityChoiceBox.setOnAction((event) -> {
             int selectedIndex = AICreativityChoiceBox.getSelectionModel().getSelectedIndex();
-            if (selectedIndex == 0) {
-                LLaMAConf.AI_CREATIVITY = 0.1;
-            } else if (selectedIndex == 1) {
-                LLaMAConf.AI_CREATIVITY = 0.2;
-            } else if (selectedIndex == 2) {
-                LLaMAConf.AI_CREATIVITY = 0.3;
-            } else if (selectedIndex == 3) {
-                LLaMAConf.AI_CREATIVITY = 0.4;
-            } else if (selectedIndex == 4) {
-                LLaMAConf.AI_CREATIVITY = 0.5;
-            } else if (selectedIndex == 5) {
-                LLaMAConf.AI_CREATIVITY = 0.6;
-            } else if (selectedIndex == 6) {
-                LLaMAConf.AI_CREATIVITY = 0.7;
-            } else if (selectedIndex == 7) {
-                LLaMAConf.AI_CREATIVITY = 0.8;
-            } else if (selectedIndex == 8) {
-                LLaMAConf.AI_CREATIVITY = 0.9;
-            } else {
-                LLaMAConf.AI_CREATIVITY = 0.3;
+            if (selectedIndex < 0 || selectedIndex >= responseStyleTemperatures.length) {
+                return;
             }
 
+            LLaMAConf.AI_CREATIVITY = responseStyleTemperatures[selectedIndex];
             SysConfigAction.updateConfigAICreativity(LLaMAConf.AI_CREATIVITY);
             LLaMAServerCtrl.restartLLaMAServer();
         });
 
         return AICreativityChoiceBox;
+    }
+
+    private static String getResponseStyleChoice(String styleLangKey) {
+        return SysConfigAction.getLang("responseStyle") + "：" + SysConfigAction.getLang(styleLangKey);
+    }
+
+    private static int getResponseStyleIndex(double temperature) {
+        if (temperature <= 0.2) {
+            return 0;
+        } else if (temperature <= 0.4) {
+            return 1;
+        } else if (temperature <= 0.6) {
+            return 2;
+        } else if (temperature <= 0.8) {
+            return 3;
+        }
+        return 4;
     }
 
 
