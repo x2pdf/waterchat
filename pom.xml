@@ -86,6 +86,9 @@
                 <artifactId>maven-jar-plugin</artifactId>
                 <version>3.4.2</version>
                 <configuration>
+                    <!-- Keep jpackage input isolated from target/classes. Large
+                         resources are already embedded in the application JAR. -->
+                    <outputDirectory>${project.build.directory}/jpackage-input</outputDirectory>
                     <archive>
                         <manifest>
                             <mainClass>com.logan.waterchat.WaterChatApplication</mainClass>
@@ -105,7 +108,7 @@
                             <goal>copy-dependencies</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${project.build.directory}/lib</outputDirectory>
+                            <outputDirectory>${project.build.directory}/jpackage-input</outputDirectory>
                         </configuration>
                     </execution>
                 </executions>
@@ -140,17 +143,18 @@
                     <vendor>Logan</vendor>
                     <destination>${project.basedir}/build</destination>
                     <type>DMG</type>
-                    <input>target</input>
+                    <input>${project.build.directory}/jpackage-input</input>
                     <mainJar>${project.build.finalName}.jar</mainJar>
                     <mainClass>com.logan.waterchat.WaterChatApplication</mainClass>
                     <icon>${project.basedir}/src/main/resources/waterchat_icon.icns</icon>
                     <modulePaths>
-                        <path>${project.build.directory}/lib</path>
+                        <path>${project.build.directory}/jpackage-input</path>
                     </modulePaths>
                     <addModules>
                         <module>javafx.controls</module>
                         <module>javafx.base</module>
                         <module>javafx.graphics</module>
+                        <module>java.net.http</module>
                     </addModules>
                     <verbose>true</verbose>
                 </configuration>

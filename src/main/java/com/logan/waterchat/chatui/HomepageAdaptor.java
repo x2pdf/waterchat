@@ -54,11 +54,24 @@ public class HomepageAdaptor {
                 String result = service.getValue();
                 HomepageAdaptor.addAnswer2MessagesList(result);
                 HomepageAdaptor.freshChatMsgBox();
-                Homepage.unfreezeInputTextArea();
             } catch (Exception e) {
                 LogUtils.error("setOnSucceeded 中发生异常" + e);
                 e.printStackTrace();
+            } finally {
+                Homepage.unfreezeInputTextArea();
             }
+        });
+        service.setOnFailed(event -> {
+            Throwable error = service.getException();
+            String errorMessage = error == null ? "未知错误" : error.toString();
+            LogUtils.error("AI 请求失败: " + errorMessage);
+            LogUtils.log2LocalLogFile("AI 请求失败: " + errorMessage);
+            Homepage.unfreezeInputTextArea();
+            AlertUtils.msg("AI 请求失败，请确认本地模型服务正常运行。\n\n" + errorMessage);
+        });
+        service.setOnCancelled(event -> {
+            LogUtils.info("AI 请求已取消");
+            Homepage.unfreezeInputTextArea();
         });
         service.start();
 

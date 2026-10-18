@@ -4,8 +4,9 @@ package com.logan.waterchat.chat.llamaccp;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.logan.waterchat.chat.model.MessageResDTO;
+import com.logan.waterchat.config.SysConfig;
 import com.logan.waterchat.utils.LogUtils;
-import java.io.InputStream;
+import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -18,23 +19,24 @@ import java.util.Map;
 
 public class AppHttpUtils {
     private static final ObjectMapper mapper = new ObjectMapper();
-    private static String CURRENT_MODEL = LLaMAConf.LLAMA_SERVER_BASE_MODEL;
     private static final String BASE_URL = "http://" + LLaMAConf.LLAMA_SERVER_HOST + ":" + LLaMAConf.LLAMA_SERVER_PORT;
     private static final String CHAT_URL = LLaMAConf.LLAMA_SERVER_BASE_URL;
     private static final String HEALTH_URL = BASE_URL + "/health";
     // 如果服务不需要 API Key 可留空
     private static final String API_KEY = "********";
     private static final ObjectMapper MAPPER = new ObjectMapper();
-    private static int timeout = 600000; // 10 minutes
+    private static final Duration CONNECT_TIMEOUT = Duration.ofSeconds(3);
+    private static final Duration HEALTH_TIMEOUT = Duration.ofSeconds(2);
+    private static final Duration CHAT_TIMEOUT = Duration.ofMinutes(2);
 
     public static boolean isLlamaServerHealth() {
         HttpClient client = HttpClient.newBuilder()
-                .connectTimeout(Duration.ofMillis(3000))
+                .connectTimeout(CONNECT_TIMEOUT)
                 .build();
         try {
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create(HEALTH_URL))
-                    .timeout(Duration.ofMillis(8000))
+                    .timeout(HEALTH_TIMEOUT)
                     .GET()
                     .build();
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
@@ -51,7 +53,7 @@ public class AppHttpUtils {
             LogUtils.info("健康检查结果: " + result);
             return result;
         } catch (Throwable e) {
-            e.printStackTrace();
+            LogUtils.error("健康检查异常: " + e);
             return false;
         }
     }
@@ -60,20 +62,22 @@ public class AppHttpUtils {
 
     public static MessageResDTO sendChat(List<Map<String, String>> messages) throws Exception {
         Map<String, Object> body = new HashMap<>();
-        body.put("model", CURRENT_MODEL);
+        body.put("model", SysConfig.MODEL_NAME);
         body.put("messages", messages);
-        body.put("reasoning_budget", 1024);
+        body.put("reasoning_budget", 0);
+        body.put("stream", false);
         String json = MAPPER.writeValueAsString(body);
-        LogUtils.info("req body json: " + json);
+        LogUtils.info("开始请求 llama-server，消息数: " + messages.size());
 
         HttpClient client = HttpClient.newBuilder()
-                .connectTimeout(Duration.ofMillis(3000))
+                .connectTimeout(CONNECT_TIMEOUT)
                 .build();
 
+        long startNanos = System.nanoTime();
         try {
             HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
                     .uri(URI.create(CHAT_URL))
-                    .timeout(Duration.ofMillis(timeout))
+                    .timeout(CHAT_TIMEOUT)
                     .header("Content-Type", "application/json")
                     .POST(HttpRequest.BodyPublishers.ofString(json, StandardCharsets.UTF_8));
 
@@ -82,11 +86,20 @@ public class AppHttpUtils {
             }
 
             HttpRequest post = requestBuilder.build();
-            HttpResponse<InputStream> response = client.send(post, HttpResponse.BodyHandlers.ofInputStream());
+            HttpResponse<String> response = client.send(post, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
+            long elapsedMillis = Duration.ofNanos(System.nanoTime() - startNanos).toMillis();
+            LogUtils.info("llama-server 响应完成，状态码: " + response.statusCode()
+                    + "，耗时: " + elapsedMillis + "ms");
+
+            if (response.statusCode() < 200 || response.statusCode() >= 300) {
+                throw new IOException("llama-server HTTP " + response.statusCode() + ": " + response.body());
+            }
+
             Map<?, ?> result = MAPPER.readValue(response.body(), Map.class);
             return getMsg(result);
         } catch (Exception e) {
-            LogUtils.error("sendChat error: " + e.toString());
+            long elapsedMillis = Duration.ofNanos(System.nanoTime() - startNanos).toMillis();
+            LogUtils.error("sendChat error after " + elapsedMillis + "ms: " + e);
             throw e;
         }
     }
@@ -113,5 +126,3 @@ public class AppHttpUtils {
 
 
 }
-
-

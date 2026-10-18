@@ -26,6 +26,7 @@ public class LLaMAServerCtrl {
 
     public static void startLLaMAServer() {
         try {
+            LLaMAConf.IS_LLAMA_SERVER_STARTED = false;
             refreshCurrentModel();
 
             HashMap<String, String> allConfigKeyValue = SysConfigAction.getAllConfigKeyValue();
@@ -123,6 +124,7 @@ public class LLaMAServerCtrl {
 
 
     public static void shutdownLLaMAServer() {
+        LLaMAConf.IS_LLAMA_SERVER_STARTED = false;
         if (process != null) {
             process.destroy();
             try {
@@ -139,7 +141,7 @@ public class LLaMAServerCtrl {
 
     public static String callLLaMAServer() throws Exception {
         callLLaMAServerDetection();
-        if (!process.isAlive() || !AppHttpUtils.isLlamaServerHealth()){
+        if (process == null || !process.isAlive()){
             String llamaServerRunningErrorNowMsg = "应用（server）运行出错。请退出应用，然后重新打开应用。敬请谅解！" +
                     "\n\nThe application (server) encountered an error. " +
                     "Please exit the application and then reopen it. " +
@@ -167,19 +169,23 @@ public class LLaMAServerCtrl {
 
 
     public static void callLLaMAServerDetection() {
-        for (int i = 0; i < 10; i++) {
-            if (LLaMAConf.IS_LLAMA_SERVER_STARTED) {
-                LogUtils.info("LLAMA_SERVER 已经启动！");
-                break;
-            } else {
-                try {
-                    Thread.sleep(1000);
-                    LogUtils.info("等待 LLAMA_SERVER 启动...");
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+        long deadlineNanos = System.nanoTime() + TimeUnit.SECONDS.toNanos(10);
+        while (System.nanoTime() < deadlineNanos) {
+            if (process == null || !process.isAlive()) {
+                throw new IllegalStateException("llama-server 进程未运行");
+            }
+            if (AppHttpUtils.isLlamaServerHealth()) {
+                LLaMAConf.IS_LLAMA_SERVER_STARTED = true;
+                LogUtils.info("LLAMA_SERVER 已经启动并通过健康检查！");
+                return;
+            }
+            try {
+                Thread.sleep(250);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                throw new IllegalStateException("等待 llama-server 启动时被中断", e);
             }
         }
-
+        throw new IllegalStateException("等待 llama-server 启动超时");
     }
 }
