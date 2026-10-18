@@ -2,6 +2,7 @@ package com.logan.waterchat.chat.llamaccp;
 
 
 import com.logan.waterchat.chat.model.MessageResDTO;
+import com.logan.waterchat.chat.longtext.LongTextAnalyzer;
 import com.logan.waterchat.chatui.HomepageAdaptor;
 import com.logan.waterchat.config.SysConfig;
 import com.logan.waterchat.config.SysConfigAction;
@@ -15,6 +16,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.function.BooleanSupplier;
+import java.util.function.Consumer;
 
 public class LLaMAServerCtrl {
     public static Process process;
@@ -140,6 +143,11 @@ public class LLaMAServerCtrl {
 
 
     public static String callLLaMAServer() throws Exception {
+        return callLLaMAServer(null, ignored -> { }, () -> false);
+    }
+
+    public static String callLLaMAServer(String currentMessage, Consumer<String> progress,
+                                         BooleanSupplier cancelled) throws Exception {
         callLLaMAServerDetection();
         if (process == null || !process.isAlive()){
             String llamaServerRunningErrorNowMsg = "应用（server）运行出错。请退出应用，然后重新打开应用。敬请谅解！" +
@@ -149,9 +157,37 @@ public class LLaMAServerCtrl {
             LogUtils.error("LLaMAServer 运行出错了。请退出应用，然后重新打开应用。");
             return llamaServerRunningErrorNowMsg;
         }
+        if (currentMessage != null
+                && AppHttpUtils.countTokens(currentMessage) > SysConfig.LONG_TEXT_CHUNK_TOKENS) {
+            HomepageAdaptor.compressLatestUserMessageForModel(currentMessage);
+            return LongTextAnalyzer.analyze(currentMessage, progress, cancelled);
+        }
         List<Map<String, String>> messages = new ArrayList<>();
-        MessageResDTO messageResDTO = AppHttpUtils.sendChat(HomepageAdaptor.assembleMsg(messages));
+        HomepageAdaptor.assembleMsg(messages);
+        trimHistoryToBudget(messages);
+        MessageResDTO messageResDTO = AppHttpUtils.sendChat(messages);
         return assembleModelResMessage(messageResDTO);
+    }
+
+    private static void trimHistoryToBudget(List<Map<String, String>> messages) {
+        while (messages.size() > 1
+                && AppHttpUtils.countTokens(joinMessageContent(messages)) > SysConfig.LONG_TEXT_CHUNK_TOKENS) {
+            int removeIndex = "system".equals(messages.get(0).get("role")) && messages.size() > 2 ? 1 : 0;
+            if (removeIndex >= messages.size() - 1) {
+                break;
+            }
+            messages.remove(removeIndex);
+            LogUtils.info("上下文超出预算，已从本次请求中省略一条较早消息");
+        }
+    }
+
+    private static String joinMessageContent(List<Map<String, String>> messages) {
+        StringBuilder content = new StringBuilder();
+        for (Map<String, String> message : messages) {
+            content.append(message.get("role")).append(':')
+                    .append(message.get("content")).append('\n');
+        }
+        return content.toString();
     }
 
 

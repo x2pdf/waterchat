@@ -21,6 +21,11 @@ public class SysConfig {
 
     public static boolean IS_LOG_SESSION = true;
     public static boolean IS_USE_VULKAN = false;
+    public static int CONTEXT_SIZE = 32768;
+    public static int MAX_GENERATION_TOKENS = 2048;
+    public static int LONG_TEXT_CHUNK_TOKENS = 24000;
+    public static int LONG_TEXT_MAX_CHUNKS = 20;
+    public static int CHAT_REQUEST_TIMEOUT_SECONDS = 600;
     // APP 要保存的目标路径，默认为用户 Downloads 路径
     public static String APP_DOWNLOAD_PATH = "";
 

@@ -13,7 +13,7 @@ public class LLaMAParams {
         String topP = "0.95";
         String minP = "0.05";
         String presencePenalty = "1.2";
-        String c = "2048";
+        String c = "32768";
         String n = "2048";
         for (String key : allConfigKeyValue.keySet()) {
             if ("-ngl".equals(key)) {

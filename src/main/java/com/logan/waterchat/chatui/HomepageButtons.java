@@ -23,6 +23,7 @@ public class HomepageButtons {
 
         buttonSend.setOnAction(event -> {
             if (Homepage.isTextAreaInputFreeze) {
+                HomepageAdaptor.cancelCurrentRequest();
                 return;
             }
             String msg = Homepage.textAreaInput.getText();
@@ -38,7 +39,10 @@ public class HomepageButtons {
                     }
                 }
             }
-            LogUtils.info("======== input msg: " + msg);
+            if (msg != null) {
+                LogUtils.info("input message accepted: chars=" + msg.length()
+                        + ", lines=" + com.logan.waterchat.chat.longtext.LongTextUtils.countLines(msg));
+            }
             if (msg != null && !msg.isEmpty()) {
                 // 消息加入到本地缓存list
                 HomepageAdaptor.addQuestion2MessagesList(msg);

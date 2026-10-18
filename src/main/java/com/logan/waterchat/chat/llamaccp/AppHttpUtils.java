@@ -22,12 +22,13 @@ public class AppHttpUtils {
     private static final String BASE_URL = "http://" + LLaMAConf.LLAMA_SERVER_HOST + ":" + LLaMAConf.LLAMA_SERVER_PORT;
     private static final String CHAT_URL = LLaMAConf.LLAMA_SERVER_BASE_URL;
     private static final String HEALTH_URL = BASE_URL + "/health";
+    private static final String TOKENIZE_URL = BASE_URL + "/tokenize";
     // 如果服务不需要 API Key 可留空
     private static final String API_KEY = "********";
     private static final ObjectMapper MAPPER = new ObjectMapper();
     private static final Duration CONNECT_TIMEOUT = Duration.ofSeconds(3);
     private static final Duration HEALTH_TIMEOUT = Duration.ofSeconds(2);
-    private static final Duration CHAT_TIMEOUT = Duration.ofMinutes(2);
+    private static volatile boolean tokenizeFallbackLogged = false;
 
     public static boolean isLlamaServerHealth() {
         HttpClient client = HttpClient.newBuilder()
@@ -61,11 +62,16 @@ public class AppHttpUtils {
 
 
     public static MessageResDTO sendChat(List<Map<String, String>> messages) throws Exception {
+        return sendChat(messages, SysConfig.MAX_GENERATION_TOKENS);
+    }
+
+    public static MessageResDTO sendChat(List<Map<String, String>> messages, int maxTokens) throws Exception {
         Map<String, Object> body = new HashMap<>();
         body.put("model", SysConfig.MODEL_NAME);
         body.put("messages", messages);
         body.put("reasoning_budget", 0);
         body.put("stream", false);
+        body.put("max_tokens", maxTokens);
         String json = MAPPER.writeValueAsString(body);
         LogUtils.info("开始请求 llama-server，消息数: " + messages.size());
 
@@ -77,7 +83,7 @@ public class AppHttpUtils {
         try {
             HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
                     .uri(URI.create(CHAT_URL))
-                    .timeout(CHAT_TIMEOUT)
+                    .timeout(Duration.ofSeconds(SysConfig.CHAT_REQUEST_TIMEOUT_SECONDS))
                     .header("Content-Type", "application/json")
                     .POST(HttpRequest.BodyPublishers.ofString(json, StandardCharsets.UTF_8));
 
@@ -101,6 +107,48 @@ public class AppHttpUtils {
             long elapsedMillis = Duration.ofNanos(System.nanoTime() - startNanos).toMillis();
             LogUtils.error("sendChat error after " + elapsedMillis + "ms: " + e);
             throw e;
+        }
+    }
+
+    /**
+     * Count tokens with llama-server's tokenizer. If the endpoint is unavailable,
+     * use a deliberately conservative UTF-8 byte estimate so chunks remain safe.
+     */
+    public static int countTokens(String content) {
+        if (content == null || content.isEmpty()) {
+            return 0;
+        }
+        try {
+            Map<String, Object> body = new HashMap<>();
+            body.put("content", content);
+            body.put("add_special", false);
+            String json = MAPPER.writeValueAsString(body);
+            HttpClient client = HttpClient.newBuilder().connectTimeout(CONNECT_TIMEOUT).build();
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(TOKENIZE_URL))
+                    .timeout(Duration.ofSeconds(30))
+                    .header("Content-Type", "application/json")
+                    .POST(HttpRequest.BodyPublishers.ofString(json, StandardCharsets.UTF_8))
+                    .build();
+            HttpResponse<String> response = client.send(request,
+                    HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
+            if (response.statusCode() < 200 || response.statusCode() >= 300) {
+                throw new IOException("tokenize HTTP " + response.statusCode());
+            }
+            JsonNode tokens = MAPPER.readTree(response.body()).path("tokens");
+            if (!tokens.isArray()) {
+                throw new IOException("tokenize response has no tokens array");
+            }
+            return tokens.size();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new IllegalStateException("token counting cancelled", e);
+        } catch (Exception e) {
+            if (!tokenizeFallbackLogged) {
+                tokenizeFallbackLogged = true;
+                LogUtils.error("tokenize endpoint unavailable; using UTF-8 fallback: " + e);
+            }
+            return content.getBytes(StandardCharsets.UTF_8).length;
         }
     }
 

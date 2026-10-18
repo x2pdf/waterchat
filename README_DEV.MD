@@ -126,8 +126,12 @@ is_use_vulkan=false         # 是否启用Vulkan后端（true=启用Vulkan，fal
 
 --min-p=0.05               # 最小概率过滤；剔除概率低于最高概率Token的5%的候选Token
 
--c=2048                    # 上下文窗口大小（Context Size）；模型可记忆的历史Token数量
+-c=32768                   # 上下文窗口大小；Gemma 3 1B 的完整上下文容量
 
--n=1024                    # 本次请求最大生成Token数（llama.cpp参数，等价于max_new_tokens）
+-n=2048                    # 本次请求最大生成Token数（llama.cpp参数）
 
 --presence-penalty=1.2     # 存在惩罚；已经出现过的词再次出现时降低概率，减少重复
+
+long_text_chunk_tokens=24000       # 长文本单块最大输入Token数，为提示词和输出预留空间
+long_text_max_chunks=20            # 单次长文本任务最多允许的原始分块数
+chat_request_timeout_seconds=600   # 每次本地模型HTTP请求的超时时间

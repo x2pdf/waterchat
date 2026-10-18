@@ -6,6 +6,7 @@ import com.logan.waterchat.chat.llamaccp.LLaMAConf;
 import com.logan.waterchat.config.AppUIConfig;
 import com.logan.waterchat.config.InitSourceTemplate;
 import com.logan.waterchat.config.SysConfig;
+import com.logan.waterchat.config.SysConfigAction;
 import com.logan.waterchat.utils.AppSystemOS;
 import com.logan.waterchat.utils.ConfigUtils;
 import com.logan.waterchat.utils.LocalFileUtils;
@@ -62,6 +63,11 @@ public class ConfigFileAppInit implements AppInitInterface {
             e.printStackTrace();
         }
 
+        if (configHashMap == null) {
+            configHashMap = new HashMap<>();
+        }
+        migrateLongTextConfig(configPath, configHashMap);
+
         String fontSize = configHashMap.get("font_size");
         if (fontSize != null) {
             AppUIConfig.FONT_SIZE = Integer.parseInt(fontSize);
@@ -115,6 +121,51 @@ public class ConfigFileAppInit implements AppInitInterface {
                             "You are humanity's best friend!";
                 }
             }
+        }
+
+
+        SysConfig.CONTEXT_SIZE = positiveInt(configHashMap.get("-c"), 32768);
+        SysConfig.MAX_GENERATION_TOKENS = positiveInt(configHashMap.get("-n"), 2048);
+        SysConfig.LONG_TEXT_CHUNK_TOKENS = positiveInt(configHashMap.get("long_text_chunk_tokens"), 24000);
+        SysConfig.LONG_TEXT_MAX_CHUNKS = positiveInt(configHashMap.get("long_text_max_chunks"), 20);
+        SysConfig.CHAT_REQUEST_TIMEOUT_SECONDS = positiveInt(configHashMap.get("chat_request_timeout_seconds"), 600);
+    }
+
+    private static void migrateLongTextConfig(String configPath, HashMap<String, String> config) {
+        boolean legacyConfig = config.get("config_schema_version") == null;
+        if (legacyConfig && "5000".equals(config.get("-c"))) {
+            SysConfigAction.updateConfigValue(configPath, "-c", "32768");
+            config.put("-c", "32768");
+        }
+        if (legacyConfig && "1024".equals(config.get("-n"))) {
+            SysConfigAction.updateConfigValue(configPath, "-n", "2048");
+            config.put("-n", "2048");
+        }
+        ensureConfigValue(configPath, config, "config_schema_version", "2");
+        ensureConfigValue(configPath, config, "long_text_chunk_tokens", "24000");
+        ensureConfigValue(configPath, config, "long_text_max_chunks", "20");
+        ensureConfigValue(configPath, config, "chat_request_timeout_seconds", "600");
+    }
+
+    private static void ensureConfigValue(String configPath, HashMap<String, String> config,
+                                          String key, String value) {
+        if (config.containsKey(key)) {
+            return;
+        }
+        try {
+            SysConfigAction.appendConfigLine(configPath, key + "=" + value);
+            config.put(key, value);
+        } catch (IOException e) {
+            LogUtils.error("append config value failed, key=" + key + ", error=" + e);
+        }
+    }
+
+    private static int positiveInt(String value, int fallback) {
+        try {
+            int parsed = Integer.parseInt(value);
+            return parsed > 0 ? parsed : fallback;
+        } catch (Exception e) {
+            return fallback;
         }
     }
 

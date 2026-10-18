@@ -5,9 +5,12 @@ import com.logan.waterchat.chat.model.ChatRoleEnum;
 import com.logan.waterchat.chat.model.MessageDTO;
 import com.logan.waterchat.chat.model.SessionCtrl;
 import com.logan.waterchat.chat.llamaccp.LLaMAServerCtrl;
+import com.logan.waterchat.chat.longtext.LongTextUtils;
+import com.logan.waterchat.chat.longtext.LongTextTooLargeException;
 import com.logan.waterchat.utils.LogUtils;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
+import javafx.application.Platform;
 
 import java.util.HashMap;
 import java.util.List;
@@ -30,15 +33,20 @@ public class HomepageAdaptor {
         if (service != null && service.isRunning()) {
             service.cancel();
         }
-        service = new Service<String>() {
+        Service<String> currentService = new Service<String>() {
             @Override
             protected Task<String> createTask() {
                 return new Task<String>() {
                     @Override
                     protected String call() throws Exception {
                         try {
-                            String result = LLaMAServerCtrl.callLLaMAServer();
-                            return result;
+                            String preview = LongTextUtils.createPreview(msg);
+                            Platform.runLater(() -> {
+                                updateLatestUserDisplay(preview);
+                                HomepageAdaptor.freshChatMsgBox();
+                            });
+                            return LLaMAServerCtrl.callLLaMAServer(msg, this::updateMessage,
+                                    this::isCancelled);
                         } catch (Exception e) {
                             LogUtils.error("Task 执行异常" + e);
                             throw e;   // 让它走 FAILED 流程
@@ -47,11 +55,14 @@ public class HomepageAdaptor {
                 };
             }
         };
+        service = currentService;
+        currentService.messageProperty().addListener((observable, oldValue, newValue) ->
+                Homepage.setProgressText(newValue));
 
         // 监听Service的状态，当任务完成时更新TextArea
-        service.setOnSucceeded(event -> {
+        currentService.setOnSucceeded(event -> {
             try {
-                String result = service.getValue();
+                String result = currentService.getValue();
                 HomepageAdaptor.addAnswer2MessagesList(result);
                 HomepageAdaptor.freshChatMsgBox();
             } catch (Exception e) {
@@ -61,19 +72,23 @@ public class HomepageAdaptor {
                 Homepage.unfreezeInputTextArea();
             }
         });
-        service.setOnFailed(event -> {
-            Throwable error = service.getException();
+        currentService.setOnFailed(event -> {
+            Throwable error = currentService.getException();
             String errorMessage = error == null ? "未知错误" : error.toString();
             LogUtils.error("AI 请求失败: " + errorMessage);
             LogUtils.log2LocalLogFile("AI 请求失败: " + errorMessage);
             Homepage.unfreezeInputTextArea();
-            AlertUtils.msg("AI 请求失败，请确认本地模型服务正常运行。\n\n" + errorMessage);
+            if (error instanceof LongTextTooLargeException) {
+                AlertUtils.msg(error.getMessage());
+            } else {
+                AlertUtils.msg("AI 请求失败，请确认本地模型服务正常运行。\n\n" + errorMessage);
+            }
         });
-        service.setOnCancelled(event -> {
+        currentService.setOnCancelled(event -> {
             LogUtils.info("AI 请求已取消");
             Homepage.unfreezeInputTextArea();
         });
-        service.start();
+        currentService.start();
 
     }
 
@@ -99,6 +114,8 @@ public class HomepageAdaptor {
         MessageDTO messageDTO = new MessageDTO();
         messageDTO.setRole(ChatRoleEnum.user);
         messageDTO.setContent(msg);
+        messageDTO.setDisplayContent(LongTextUtils.preparingDisplay(msg));
+        messageDTO.setModelContent(msg);
         SessionCtrl.messageDTOS.add(messageDTO);
     }
 
@@ -127,10 +144,39 @@ public class HomepageAdaptor {
 
     public static List<Map<String, String>> assembleMsg(List<Map<String, String>> messages) {
         for (MessageDTO messageDTO : SessionCtrl.messageDTOS) {
-            String msg = messageDTO.getContent();
+            String msg = messageDTO.getModelContent();
             messages.add(msg(messageDTO.getRole().toString(), msg));
         }
         return messages;
+    }
+
+    public static void cancelCurrentRequest() {
+        Service<String> current = service;
+        if (current != null && current.isRunning()) {
+            current.cancel();
+        }
+    }
+
+    public static void updateLatestUserDisplay(String display) {
+        for (int i = SessionCtrl.messageDTOS.size() - 1; i >= 0; i--) {
+            MessageDTO message = SessionCtrl.messageDTOS.get(i);
+            if (message.getRole() == ChatRoleEnum.user) {
+                message.setDisplayContent(display);
+                return;
+            }
+        }
+    }
+
+    public static void compressLatestUserMessageForModel(String raw) {
+        for (int i = SessionCtrl.messageDTOS.size() - 1; i >= 0; i--) {
+            MessageDTO message = SessionCtrl.messageDTOS.get(i);
+            if (message.getRole() == ChatRoleEnum.user && raw.equals(message.getContent())) {
+                message.setModelContent("[一份长文本已通过分块流程分析："
+                        + LongTextUtils.countLines(raw) + " 行，" + raw.length()
+                        + " 字符。完整内容未重复放入后续上下文。]");
+                return;
+            }
+        }
     }
 
     private static Map<String, String> msg(String role, String content) {

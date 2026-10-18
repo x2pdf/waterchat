@@ -6,6 +6,7 @@ import com.logan.waterchat.chat.model.MessageDTO;
 import com.logan.waterchat.chat.model.SessionCtrl;
 import com.logan.waterchat.config.AppUIConfig;
 import com.logan.waterchat.config.SysConfig;
+import com.logan.waterchat.config.SysConfigAction;
 import com.logan.waterchat.utils.LogUtils;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -13,6 +14,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextArea;
+import javafx.scene.control.Label;
 import javafx.scene.layout.*;
 
 public class Homepage {
@@ -20,6 +22,8 @@ public class Homepage {
     public static VBox vbox = new VBox();
     public static ScrollPane scrollPane = new ScrollPane(vbox);
     public static boolean isTextAreaInputFreeze = false;
+    public static Label progressLabel = new Label();
+    private static Button sendButton;
 
     public static AnchorPane getHomeTab() {
         AnchorPane homepageAnchorPane = new AnchorPane();
@@ -32,7 +36,7 @@ public class Homepage {
         stackPane.setAlignment(Pos.BOTTOM_CENTER);
         stackPane.getChildren().add(textAreaInput);
 
-        Button sendButton = HomepageButtons.getSendButton();
+        sendButton = HomepageButtons.getSendButton();
         Button newChatButton = HomepageButtons.getNewChatButton();
         Button openDeviceBrowserButton = HomepageButtons.getOpenDeviceBrowserButton();
 
@@ -49,7 +53,8 @@ public class Homepage {
 
         VBox homepageVBox = new VBox();
         homepageVBox.setVgrow(scrollPane, Priority.ALWAYS); // 将 scrollPane 中的会话窗口从最顶开始往下显示
-        homepageVBox.getChildren().addAll(scrollPane, stackPane, buttonBox);
+        progressLabel.setWrapText(true);
+        homepageVBox.getChildren().addAll(scrollPane, stackPane, progressLabel, buttonBox);
         homepageVBox.setSpacing(3);
         homepageVBox.setPadding(new Insets(AppUIConfig.MARGIN_DEFAULT, 2, AppUIConfig.MARGIN_DEFAULT, 2));
         homepageVBox.setAlignment(Pos.BOTTOM_CENTER);
@@ -78,7 +83,7 @@ public class Homepage {
             if (!HomepageAdaptor.IS_NEED_SYSTEM_PROMPT && messageDTO.getRole().equals(ChatRoleEnum.system)) {
                 continue;
             }
-            TextArea messageBox = createMessageBox(messageDTO.getContent());
+            TextArea messageBox = createMessageBox(messageDTO.getDisplayContent());
             // 重建對話box
             HomepageStyle.styleTextArea(messageBox, messageDTO.getRole());
             HomepageStyle.fontSizeTextArea(messageBox, AppUIConfig.FONT_SIZE);
@@ -86,10 +91,7 @@ public class Homepage {
         }
 
         scrollPane.setFitToWidth(true);
-        for (int i = 0; i < 30; i++) {
-            // 调用一次通常不会到滑到最底部，所以。。。
-            scrollPane.setVvalue(1); // 设置滚动条位置到最底部
-        }
+        scrollPane.setVvalue(1);
         LogUtils.info("freshChatMsgBox success.");
     }
 
@@ -112,7 +114,8 @@ public class Homepage {
         // 设置文本不可编辑
         textArea.setEditable(false);
         // 设置文本行数
-        textArea.setPrefRowCount(HomepageStyle.setTextAreaPrefRow(msgText));
+        textArea.setPrefRowCount(Math.min(30, HomepageStyle.setTextAreaPrefRow(msgText)));
+        textArea.setMaxHeight(520);
         return textArea;
     }
 
@@ -122,10 +125,8 @@ public class Homepage {
         textAreaInput.setStyle("-fx-border-color: tomato");
         // 设置自动换行
         textAreaInput.setWrapText(true);
-        textAreaInput.textProperty().addListener((observable, oldValue, newValue) -> {
-            // 在这里处理文本变化事件
-            textAreaInput.setPrefRowCount(HomepageStyle.setTextAreaPrefRow(newValue));
-        });
+        textAreaInput.setMinHeight(90);
+        textAreaInput.setMaxHeight(220);
     }
 
     public static void freezeInputTextArea() {
@@ -133,6 +134,9 @@ public class Homepage {
         textAreaInput.setText(getFreezeInputTextByLanguage(SysConfig.LANG));
         textAreaInputNoEditable();
         isTextAreaInputFreeze = true;
+        if (sendButton != null) {
+            sendButton.setText(SysConfigAction.getLang("cancel"));
+        }
     }
 
     public static String getFreezeInputTextByLanguage(String lang) {
@@ -147,6 +151,14 @@ public class Homepage {
         textAreaInput.clear();     // clear輸入框内容
         textAreaInputEnableEditable();
         isTextAreaInputFreeze = false;
+        progressLabel.setText("");
+        if (sendButton != null) {
+            sendButton.setText(SysConfigAction.getLang("send"));
+        }
+    }
+
+    public static void setProgressText(String text) {
+        progressLabel.setText(text == null ? "" : text);
     }
 
 }

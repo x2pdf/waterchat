@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.concurrent.CompletableFuture;
 
 
 public class SessionCtrl {
@@ -19,7 +20,8 @@ public class SessionCtrl {
 
     public static void createSession() {
         // 检查旧数据，保存
-        logSession(messageDTOS);
+        ArrayList<MessageDTO> sessionSnapshot = new ArrayList<>(messageDTOS);
+        CompletableFuture.runAsync(() -> logSession(sessionSnapshot));
         // 清除旧数据
         emptySession();
 
